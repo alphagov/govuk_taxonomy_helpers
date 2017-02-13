@@ -1,12 +1,10 @@
 require_relative 'spec_helper'
 require_relative 'content_item_helper'
-require 'govuk_taxonomy_helpers'
+require 'govuk_taxonomy_helpers/publishing_api_linked_edition_parser'
 
-RSpec.describe GovukTaxonomyHelpers::Taxon do
-  include ContentItemHelper
-
-  let(:root_node) { GovukTaxonomyHelpers::Taxon.new(content_item: basic_content_item("root-id")) }
-  let(:child_node_1) { GovukTaxonomyHelpers::Taxon.new(content_item: basic_content_item("child-1-id")) }
+RSpec.describe GovukTaxonomyHelpers::LinkedEdition do
+  let(:root_node) { GovukTaxonomyHelpers::LinkedEdition.new(name: "root-id", content_id: "abc", base_path: "/root-id") }
+  let(:child_node_1) { GovukTaxonomyHelpers::LinkedEdition.new(name: "child-1-id", content_id: "abc", base_path: "/child-1-id") }
 
   describe "#<<(child_node)" do
     it "makes one node the child of another node" do
@@ -20,8 +18,8 @@ RSpec.describe GovukTaxonomyHelpers::Taxon do
   describe "#tree" do
     context "given a node with a tree of successors" do
       it "returns an array representing a pre-order traversal of the tree" do
-        child_node_2 = GovukTaxonomyHelpers::Taxon.new(content_item: basic_content_item("child-2-id"))
-        child_node_3 = GovukTaxonomyHelpers::Taxon.new(content_item: basic_content_item("child-3-id"))
+        child_node_2 = GovukTaxonomyHelpers::LinkedEdition.new(name: "child-2-id", content_id: "abc", base_path: "/child-2-id")
+        child_node_3 = GovukTaxonomyHelpers::LinkedEdition.new(name: "child-3-id", content_id: "abc", base_path: "/child-3-id")
 
         root_node << child_node_1
         child_node_1 << child_node_3
@@ -57,7 +55,7 @@ RSpec.describe GovukTaxonomyHelpers::Taxon do
 
   describe "#node_depth" do
     it "returns the depth of the node in its tree" do
-      child_node_2 = GovukTaxonomyHelpers::Taxon.new(content_item: basic_content_item("child-2-id"))
+      child_node_2 = GovukTaxonomyHelpers::LinkedEdition.new(name: "child-2-id", content_id: "abc", base_path: "/child-2-id")
       root_node << child_node_1
       child_node_1 << child_node_2
 

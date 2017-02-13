@@ -27,9 +27,14 @@ require 'plek'
 require 'gds_api/publishing_api'
 require 'govuk_taxonomy_helpers'
 
-content_store = GdsApi::ContentStore.new(Plek.new.find('content-store'))
-content_item = content_store.content_item('/education')
-taxonomy = GovukTaxonomyHelpers::Taxon.new(content_item)
+publishing_api = GdsApi::PublishingApi.new(Plek.new.find('publishing-api'))
+content_item = publishing_api.get_content("c75c541-403f-4cb1-9b34-4ddde816a80d")
+expanded_links = publishing_api.get_expanded_links("c75c541-403f-4cb1-9b34-4ddde816a80d")
+
+taxonomy = GovukTaxonomyHelpers.parse_publishing_api_response(
+  content_item: content_item,
+  expanded_links: expanded_links
+)
 
 puts taxonomy.tree.map(&:name) # All taxons
 puts taxonomy.descendants(&:name) # All descendant taxons
