@@ -20,7 +20,9 @@ Or install it yourself as:
 
 ## Usage
 
-This API is provisional and is likely to change for 0.x versions.
+The API is provisional and is likely to change for versions < 1.0.0.
+
+To access the taxonomy, first request the content from the [publishing api](https://github.com/alphagov/publishing-api), then parse it to get a `LinkedEdition` object.
 
 ```ruby
 require 'plek'
@@ -35,16 +37,35 @@ taxonomy = GovukTaxonomyHelpers.parse_publishing_api_response(
   content_item: content_item,
   expanded_links: expanded_links
 )
+```
 
-puts taxonomy.tree.map(&:name) # All taxons
-puts taxonomy.descendants(&:name) # All descendant taxons
-puts taxonomy.children.map(&:name) # All direct children
+A `LinkedEdition` built from a taxon can access all *narrower term* taxons below it and all *broader term* taxons above it.
+
+A taxon may have many child taxons, but can only have one or zero parents.
+
+```ruby
+puts taxonomy.tree             # All taxons in this branch of the taxonomy
+puts taxonomy.descendants      # Just the taxons that fall under this one
+puts taxonomy.children         # All direct children
+puts taxonomy.parent           # The direct parent
+puts taxonomy.ancestors        # The path from the root of the taxonomy to the parent taxon
+puts taxonomy.breadcrumb_trail # The path from the root of the taxonomy to this taxon
+```
+
+A `LinkedEdition` built from an edition that isn't a taxon can access all taxons associated with it.
+
+```ruby
+puts taxonomy.taxons                # Directly tagged taxons
+puts taxonomy.taxons_with_ancestors # All taxons that the content can be found in
+puts taxonomy.parent                # nil
+puts taxonomy.children              # []
 ```
 
 ## Nomenclature
 
 - **Taxonomy**: The hierarchy of topics used to classify content by subject on GOV.UK. Not all content is tagged to the taxonomy. We are rolling out the taxonomy and navigation theme-by-theme.
 - **Taxon**: Any topic within the taxonomy.
+- **Edition** or **Content Item**: A distinct version of a document. A taxon is also a type of edition.
 
 
 ## Contributing

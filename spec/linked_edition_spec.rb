@@ -11,7 +11,7 @@ RSpec.describe GovukTaxonomyHelpers::LinkedEdition do
       root_node << child_node_1
 
       expect(root_node.tree).to include child_node_1
-      expect(child_node_1.parent_node).to eq root_node
+      expect(child_node_1.parent).to eq root_node
     end
   end
 
@@ -53,15 +53,15 @@ RSpec.describe GovukTaxonomyHelpers::LinkedEdition do
     end
   end
 
-  describe "#node_depth" do
+  describe "#depth" do
     it "returns the depth of the node in its tree" do
       child_node_2 = GovukTaxonomyHelpers::LinkedEdition.new(name: "child-2-id", content_id: "abc", base_path: "/child-2-id")
       root_node << child_node_1
       child_node_1 << child_node_2
 
-      expect(root_node.node_depth).to eq 0
-      expect(child_node_1.node_depth).to eq 1
-      expect(child_node_2.node_depth).to eq 2
+      expect(root_node.depth).to eq 0
+      expect(child_node_1.depth).to eq 1
+      expect(child_node_2.depth).to eq 2
     end
   end
 
@@ -70,6 +70,84 @@ RSpec.describe GovukTaxonomyHelpers::LinkedEdition do
       root_node << child_node_1
 
       expect(root_node.count).to eq 2
+    end
+  end
+
+  context "taxon with ancestors" do
+    let(:child_node_2) {GovukTaxonomyHelpers::LinkedEdition.new(name: "child-2-id", content_id: "abc", base_path: "/child-2-id")}
+
+    before do
+      root_node << child_node_1
+      child_node_1 << child_node_2
+    end
+
+    describe "#breadcrumb_trail" do
+      it "includes the ancestors plus the edition itself" do
+        expect(child_node_2.breadcrumb_trail.map(&:name)).to eq %w(root-id child-1-id child-2-id)
+      end
+
+      it "is just contains itself for the root node" do
+        expect(root_node.breadcrumb_trail.map(&:name)).to eq %w(root-id)
+      end
+    end
+
+    describe "#ancestors" do
+      it "includes the ancestors but not the edition itself" do
+        expect(child_node_2.ancestors.map(&:name)).to eq %w(root-id child-1-id)
+      end
+
+      it "is the reverse of #descendants" do
+        have_descendant_node = lambda do |ancestor|
+          ancestor.descendants.include?(child_node_2)
+        end
+
+        expect(child_node_2.ancestors).to all(satisfy(&have_descendant_node))
+      end
+
+      it "is an empty array for the root node" do
+        expect(root_node.ancestors).to be_empty
+      end
+    end
+
+    describe "#taxons" do
+      let(:edition) do
+        GovukTaxonomyHelpers::LinkedEdition.new(
+        name: "edition",
+        content_id: "abc",
+        base_path: "/edition"
+        )
+      end
+
+      it "includes only the directly linked taxons" do
+        edition.add_taxon(child_node_2)
+
+        expect(edition.taxons.map(&:name)).to eq ["child-2-id"]
+      end
+    end
+
+    describe "#taxons_with_ancestors" do
+      let(:another_taxon) do
+        GovukTaxonomyHelpers::LinkedEdition.new(
+        name: "another-taxon",
+        content_id: "abc",
+        base_path: "/another-taxon"
+        )
+      end
+
+      let(:edition) do
+        GovukTaxonomyHelpers::LinkedEdition.new(
+        name: "edition",
+        content_id: "abc",
+        base_path: "/edition"
+        )
+      end
+
+      it "includes all of the taxons and all of their anscestors" do
+        edition.add_taxon(child_node_2)
+        edition.add_taxon(another_taxon)
+
+        expect(edition.taxons_with_ancestors.map(&:name).sort).to eq %w(another-taxon child-1-id child-2-id root-id)
+      end
     end
   end
 end
