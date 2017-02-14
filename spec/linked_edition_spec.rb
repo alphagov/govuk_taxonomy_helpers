@@ -1,5 +1,4 @@
 require_relative 'spec_helper'
-require_relative 'content_item_helper'
 require 'govuk_taxonomy_helpers/publishing_api_linked_edition_parser'
 
 RSpec.describe GovukTaxonomyHelpers::LinkedEdition do
