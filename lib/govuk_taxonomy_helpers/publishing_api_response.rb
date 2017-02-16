@@ -1,6 +1,16 @@
 require 'govuk_taxonomy_helpers/linked_content_item'
 
 module GovukTaxonomyHelpers
+  class LinkedContentItem
+    def self.from_publishing_api(content_item:, expanded_links:, name_field: "title")
+      PublishingApiResponse.new(
+        content_item: content_item,
+        expanded_links: expanded_links,
+        name_field: name_field
+      ).linked_content_item
+    end
+  end
+
   class PublishingApiResponse
     attr_accessor :linked_content_item
 

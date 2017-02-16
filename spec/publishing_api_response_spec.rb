@@ -1,5 +1,5 @@
 require_relative 'spec_helper'
-require 'govuk_taxonomy_helpers/publishing_api_response'
+require 'govuk_taxonomy_helpers'
 
 RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
   let(:content_item) do
@@ -12,10 +12,10 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
   end
 
   let(:linked_content_item) do
-    GovukTaxonomyHelpers::PublishingApiResponse.new(
+    GovukTaxonomyHelpers::LinkedContentItem.from_publishing_api(
       content_item: content_item,
       expanded_links: expanded_links
-    ).linked_content_item
+    )
   end
 
   context "content item with multiple levels of descendants" do

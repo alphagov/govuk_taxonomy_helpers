@@ -1,6 +1,6 @@
 # GovukTaxonomyHelpers
 
-Parses the taxonomy of GOV.UK into a browsable tree structure.
+Parses the taxonomy of GOV.UK into a browseable tree structure.
 
 ## Installation
 
@@ -25,18 +25,15 @@ The API is provisional and is likely to change for versions < 1.0.0.
 To access the taxonomy, first request the content from the [publishing api](https://github.com/alphagov/publishing-api), then parse it to get a `LinkedContentItem` object.
 
 ```ruby
-require 'plek'
-require 'gds_api/publishing_api'
 require 'govuk_taxonomy_helpers'
 
-publishing_api = GdsApi::PublishingApi.new(Plek.new.find('publishing-api'))
-content_item = publishing_api.get_content("c75c541-403f-4cb1-9b34-4ddde816a80d")
-expanded_links = publishing_api.get_expanded_links("c75c541-403f-4cb1-9b34-4ddde816a80d")
+content_item = Services.publishing_api.get_content("c75c541-403f-4cb1-9b34-4ddde816a80d")
+expanded_links = Services.publishing_api.get_expanded_links("c75c541-403f-4cb1-9b34-4ddde816a80d")
 
-taxonomy = GovukTaxonomyHelpers::PublishingApiResponse.new(
+taxonomy = GovukTaxonomyHelpers::LinkedContentItem.from_publishing_api(
   content_item: content_item,
   expanded_links: expanded_links
-).linked_content_item
+)
 ```
 
 A `LinkedContentItem` built from a taxon can access all *narrower term* taxons below it and all *broader term* taxons above it.

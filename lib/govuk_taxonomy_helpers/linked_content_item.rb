@@ -68,5 +68,4 @@ module GovukTaxonomyHelpers
       "LinkedContentItem(name: #{name}, content_id: #{content_id}, base_path: #{base_path})"
     end
   end
-
 end
