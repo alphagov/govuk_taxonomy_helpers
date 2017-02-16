@@ -1,5 +1,5 @@
 module GovukTaxonomyHelpers
-  class LinkedEdition
+  class LinkedContentItem
     extend Forwardable
     attr_reader :name, :content_id, :base_path, :children
     attr_accessor :parent
@@ -65,7 +65,7 @@ module GovukTaxonomyHelpers
     end
 
     def inspect
-      "LinkedEdition(name: #{name}, content_id: #{content_id}, base_path: #{base_path})"
+      "LinkedContentItem(name: #{name}, content_id: #{content_id}, base_path: #{base_path})"
     end
   end
 

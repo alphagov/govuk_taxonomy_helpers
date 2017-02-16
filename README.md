@@ -22,7 +22,7 @@ Or install it yourself as:
 
 The API is provisional and is likely to change for versions < 1.0.0.
 
-To access the taxonomy, first request the content from the [publishing api](https://github.com/alphagov/publishing-api), then parse it to get a `LinkedEdition` object.
+To access the taxonomy, first request the content from the [publishing api](https://github.com/alphagov/publishing-api), then parse it to get a `LinkedContentItem` object.
 
 ```ruby
 require 'plek'
@@ -33,13 +33,13 @@ publishing_api = GdsApi::PublishingApi.new(Plek.new.find('publishing-api'))
 content_item = publishing_api.get_content("c75c541-403f-4cb1-9b34-4ddde816a80d")
 expanded_links = publishing_api.get_expanded_links("c75c541-403f-4cb1-9b34-4ddde816a80d")
 
-taxonomy = GovukTaxonomyHelpers.parse_publishing_api_response(
+taxonomy = GovukTaxonomyHelpers::PublishingApiResponse.new(
   content_item: content_item,
   expanded_links: expanded_links
-)
+).linked_content_item
 ```
 
-A `LinkedEdition` built from a taxon can access all *narrower term* taxons below it and all *broader term* taxons above it.
+A `LinkedContentItem` built from a taxon can access all *narrower term* taxons below it and all *broader term* taxons above it.
 
 A taxon may have many child taxons, but can only have one or zero parents.
 
@@ -52,7 +52,7 @@ puts taxonomy.ancestors        # The path from the root of the taxonomy to the p
 puts taxonomy.breadcrumb_trail # The path from the root of the taxonomy to this taxon
 ```
 
-A `LinkedEdition` built from an edition that isn't a taxon can access all taxons associated with it.
+A `LinkedContentItem` built from an content_item that isn't a taxon can access all taxons associated with it.
 
 ```ruby
 puts taxonomy.taxons                # Directly tagged taxons
@@ -65,7 +65,7 @@ puts taxonomy.children              # []
 
 - **Taxonomy**: The hierarchy of topics used to classify content by subject on GOV.UK. Not all content is tagged to the taxonomy. We are rolling out the taxonomy and navigation theme-by-theme.
 - **Taxon**: Any topic within the taxonomy.
-- **Edition** or **Content Item**: A distinct version of a document. A taxon is also a type of edition.
+- **ContentItem**: A distinct version of a document. A taxon is also a type of content item.
 
 
 ## Contributing

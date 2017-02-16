@@ -1,9 +1,9 @@
 require_relative 'spec_helper'
-require 'govuk_taxonomy_helpers/publishing_api_linked_edition_parser'
+require 'govuk_taxonomy_helpers/linked_content_item'
 
-RSpec.describe GovukTaxonomyHelpers::LinkedEdition do
-  let(:root_node) { GovukTaxonomyHelpers::LinkedEdition.new(name: "root-id", content_id: "abc", base_path: "/root-id") }
-  let(:child_node_1) { GovukTaxonomyHelpers::LinkedEdition.new(name: "child-1-id", content_id: "abc", base_path: "/child-1-id") }
+RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
+  let(:root_node) { GovukTaxonomyHelpers::LinkedContentItem.new(name: "root-id", content_id: "abc", base_path: "/root-id") }
+  let(:child_node_1) { GovukTaxonomyHelpers::LinkedContentItem.new(name: "child-1-id", content_id: "abc", base_path: "/child-1-id") }
 
   describe "#<<(child_node)" do
     it "makes one node the child of another node" do
@@ -17,8 +17,8 @@ RSpec.describe GovukTaxonomyHelpers::LinkedEdition do
   describe "#tree" do
     context "given a node with a tree of successors" do
       it "returns an array representing a pre-order traversal of the tree" do
-        child_node_2 = GovukTaxonomyHelpers::LinkedEdition.new(name: "child-2-id", content_id: "abc", base_path: "/child-2-id")
-        child_node_3 = GovukTaxonomyHelpers::LinkedEdition.new(name: "child-3-id", content_id: "abc", base_path: "/child-3-id")
+        child_node_2 = GovukTaxonomyHelpers::LinkedContentItem.new(name: "child-2-id", content_id: "abc", base_path: "/child-2-id")
+        child_node_3 = GovukTaxonomyHelpers::LinkedContentItem.new(name: "child-3-id", content_id: "abc", base_path: "/child-3-id")
 
         root_node << child_node_1
         child_node_1 << child_node_3
@@ -54,7 +54,7 @@ RSpec.describe GovukTaxonomyHelpers::LinkedEdition do
 
   describe "#depth" do
     it "returns the depth of the node in its tree" do
-      child_node_2 = GovukTaxonomyHelpers::LinkedEdition.new(name: "child-2-id", content_id: "abc", base_path: "/child-2-id")
+      child_node_2 = GovukTaxonomyHelpers::LinkedContentItem.new(name: "child-2-id", content_id: "abc", base_path: "/child-2-id")
       root_node << child_node_1
       child_node_1 << child_node_2
 
@@ -73,7 +73,7 @@ RSpec.describe GovukTaxonomyHelpers::LinkedEdition do
   end
 
   context "taxon with ancestors" do
-    let(:child_node_2) {GovukTaxonomyHelpers::LinkedEdition.new(name: "child-2-id", content_id: "abc", base_path: "/child-2-id")}
+    let(:child_node_2) {GovukTaxonomyHelpers::LinkedContentItem.new(name: "child-2-id", content_id: "abc", base_path: "/child-2-id")}
 
     before do
       root_node << child_node_1
@@ -81,7 +81,7 @@ RSpec.describe GovukTaxonomyHelpers::LinkedEdition do
     end
 
     describe "#breadcrumb_trail" do
-      it "includes the ancestors plus the edition itself" do
+      it "includes the ancestors plus the content item itself" do
         expect(child_node_2.breadcrumb_trail.map(&:name)).to eq %w(root-id child-1-id child-2-id)
       end
 
@@ -91,7 +91,7 @@ RSpec.describe GovukTaxonomyHelpers::LinkedEdition do
     end
 
     describe "#ancestors" do
-      it "includes the ancestors but not the edition itself" do
+      it "includes the ancestors but not the content item itself" do
         expect(child_node_2.ancestors.map(&:name)).to eq %w(root-id child-1-id)
       end
 
@@ -109,43 +109,43 @@ RSpec.describe GovukTaxonomyHelpers::LinkedEdition do
     end
 
     describe "#taxons" do
-      let(:edition) do
-        GovukTaxonomyHelpers::LinkedEdition.new(
-        name: "edition",
+      let(:content_item) do
+        GovukTaxonomyHelpers::LinkedContentItem.new(
+        name: "content",
         content_id: "abc",
-        base_path: "/edition"
+        base_path: "/content"
         )
       end
 
       it "includes only the directly linked taxons" do
-        edition.add_taxon(child_node_2)
+        content_item.add_taxon(child_node_2)
 
-        expect(edition.taxons.map(&:name)).to eq ["child-2-id"]
+        expect(content_item.taxons.map(&:name)).to eq ["child-2-id"]
       end
     end
 
     describe "#taxons_with_ancestors" do
       let(:another_taxon) do
-        GovukTaxonomyHelpers::LinkedEdition.new(
+        GovukTaxonomyHelpers::LinkedContentItem.new(
         name: "another-taxon",
         content_id: "abc",
         base_path: "/another-taxon"
         )
       end
 
-      let(:edition) do
-        GovukTaxonomyHelpers::LinkedEdition.new(
-        name: "edition",
+      let(:content_item) do
+        GovukTaxonomyHelpers::LinkedContentItem.new(
+        name: "content",
         content_id: "abc",
-        base_path: "/edition"
+        base_path: "/content"
         )
       end
 
       it "includes all of the taxons and all of their anscestors" do
-        edition.add_taxon(child_node_2)
-        edition.add_taxon(another_taxon)
+        content_item.add_taxon(child_node_2)
+        content_item.add_taxon(another_taxon)
 
-        expect(edition.taxons_with_ancestors.map(&:name).sort).to eq %w(another-taxon child-1-id child-2-id root-id)
+        expect(content_item.taxons_with_ancestors.map(&:name).sort).to eq %w(another-taxon child-1-id child-2-id root-id)
       end
     end
   end

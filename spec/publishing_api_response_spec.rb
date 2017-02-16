@@ -1,8 +1,8 @@
 require_relative 'spec_helper'
-require 'govuk_taxonomy_helpers'
+require 'govuk_taxonomy_helpers/publishing_api_response'
 
-RSpec.describe GovukTaxonomyHelpers::PublishingApiLinkedEditionParser do
-  let(:edition_response) do
+RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
+  let(:content_item) do
     {
       "content_id" => "64aadc14-9bca-40d9-abb4-4f21f9792a05",
       "base_path" => "/taxon",
@@ -11,15 +11,15 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiLinkedEditionParser do
     }
   end
 
-  let(:linked_edition) do
-    GovukTaxonomyHelpers.parse_publishing_api_response(
-      content_item: edition_response,
-      expanded_links: expanded_links_response
-    )
+  let(:linked_content_item) do
+    GovukTaxonomyHelpers::PublishingApiResponse.new(
+      content_item: content_item,
+      expanded_links: expanded_links
+    ).linked_content_item
   end
 
   context "content item with multiple levels of descendants" do
-    let(:expanded_links_response) do
+    let(:expanded_links) do
       grandchild_1 = {
         "content_id" => "84aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/grandchild-1",
@@ -58,14 +58,14 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiLinkedEditionParser do
     end
 
     it "parses each level of taxons" do
-      expect(linked_edition.name).to eq("Taxon")
-      expect(linked_edition.children.map(&:name)).to eq (['Child 1'])
-      expect(linked_edition.children.first.children.map(&:name)).to eq(["Grandchild 1", "Grandchild 2"])
+      expect(linked_content_item.name).to eq("Taxon")
+      expect(linked_content_item.children.map(&:name)).to eq (['Child 1'])
+      expect(linked_content_item.children.first.children.map(&:name)).to eq(["Grandchild 1", "Grandchild 2"])
     end
   end
 
   context "content item with no descendants" do
-    let(:expanded_links_response) do
+    let(:expanded_links) do
       {
         "content_id" => "64aadc14-9bca-40d9-abb4-4f21f9792a05",
         "expanded_links" => {}
@@ -73,13 +73,13 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiLinkedEditionParser do
     end
 
     it "parses each level of taxons" do
-      expect(linked_edition.name).to eq("Taxon")
-      expect(linked_edition.children).to be_empty
+      expect(linked_content_item.name).to eq("Taxon")
+      expect(linked_content_item.children).to be_empty
     end
   end
 
   context "content item with children but no grandchildren" do
-    let(:expanded_links_response) do
+    let(:expanded_links) do
       child_1 = {
         "content_id" => "74aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/child-1",
@@ -105,14 +105,14 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiLinkedEditionParser do
     end
 
     it "parses each level of taxons" do
-      expect(linked_edition.name).to eq("Taxon")
-      expect(linked_edition.children.map(&:name)).to eq(["Child 1", "Child 2"])
-      expect(linked_edition.children.map(&:children)).to all(be_empty)
+      expect(linked_content_item.name).to eq("Taxon")
+      expect(linked_content_item.children.map(&:name)).to eq(["Child 1", "Child 2"])
+      expect(linked_content_item.children.map(&:children)).to all(be_empty)
     end
   end
 
   context "content item with parents and grandparents" do
-    let(:expanded_links_response) do
+    let(:expanded_links) do
       grandparent_1 = {
         "content_id" => "84aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/grandparent-1",
@@ -140,15 +140,15 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiLinkedEditionParser do
     end
 
     it "parses the ancestors" do
-      expect(linked_edition.name).to eq("Taxon")
-      expect(linked_edition.parent.name).to eq("Parent 1")
-      expect(linked_edition.ancestors.map(&:name)).to eq(["Grandparent 1", "Parent 1"])
+      expect(linked_content_item.name).to eq("Taxon")
+      expect(linked_content_item.parent.name).to eq("Parent 1")
+      expect(linked_content_item.ancestors.map(&:name)).to eq(["Grandparent 1", "Parent 1"])
     end
   end
 
 
   context "content item with parents and no grandparents" do
-    let(:expanded_links_response) do
+    let(:expanded_links) do
       parent_1 = {
         "content_id" => "74aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/parent-1",
@@ -165,14 +165,14 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiLinkedEditionParser do
     end
 
     it "parses the ancestors" do
-      expect(linked_edition.name).to eq("Taxon")
-      expect(linked_edition.parent.name).to eq("Parent 1")
-      expect(linked_edition.ancestors.map(&:name)).to eq(["Parent 1"])
+      expect(linked_content_item.name).to eq("Taxon")
+      expect(linked_content_item.parent.name).to eq("Parent 1")
+      expect(linked_content_item.ancestors.map(&:name)).to eq(["Parent 1"])
     end
   end
 
   context "content item with no parents" do
-    let(:expanded_links_response) do
+    let(:expanded_links) do
       {
         "content_id" => "64aadc14-9bca-40d9-abb4-4f21f9792a05",
         "expanded_links" => {}
@@ -180,14 +180,14 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiLinkedEditionParser do
     end
 
     it "parses the ancestors" do
-      expect(linked_edition.name).to eq("Taxon")
-      expect(linked_edition.parent).to be_nil
-      expect(linked_edition.ancestors.map(&:name)).to be_empty
+      expect(linked_content_item.name).to eq("Taxon")
+      expect(linked_content_item.parent).to be_nil
+      expect(linked_content_item.ancestors.map(&:name)).to be_empty
     end
   end
 
   context "content item with multiple parents" do
-    let(:expanded_links_response) do
+    let(:expanded_links) do
       parent_1 = {
         "content_id" => "74aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/parent-1",
@@ -211,14 +211,14 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiLinkedEditionParser do
     end
 
     it "uses only the first parent" do
-      expect(linked_edition.name).to eq("Taxon")
-      expect(linked_edition.parent.name).to eq("Parent 1")
-      expect(linked_edition.ancestors.map(&:name)).to eq(["Parent 1"])
+      expect(linked_content_item.name).to eq("Taxon")
+      expect(linked_content_item.parent.name).to eq("Parent 1")
+      expect(linked_content_item.ancestors.map(&:name)).to eq(["Parent 1"])
     end
   end
 
-  context "an edition tagged to multiple taxons" do
-    let(:expanded_links_response) do
+  context "a content item tagged to multiple taxons" do
+    let(:expanded_links) do
       grandparent_1 = {
         "content_id" => "22aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/grandparent-1",
@@ -278,9 +278,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiLinkedEditionParser do
     end
 
     it "parses the taxons and their ancestors" do
-      expect(linked_edition.parent).to be_nil
-      expect(linked_edition.taxons.map(&:name)).to eq(["Taxon 1", "Taxon 2"])
-      expect(linked_edition.taxons_with_ancestors.map(&:name).sort).to eq(
+      expect(linked_content_item.parent).to be_nil
+      expect(linked_content_item.taxons.map(&:name)).to eq(["Taxon 1", "Taxon 2"])
+      expect(linked_content_item.taxons_with_ancestors.map(&:name).sort).to eq(
         [
           "Grandparent 1", "Grandparent 2",
           "Parent 1", "Parent 2",

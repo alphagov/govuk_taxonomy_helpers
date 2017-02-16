@@ -1,18 +1,22 @@
-require 'govuk_taxonomy_helpers/linked_edition'
+require 'govuk_taxonomy_helpers/linked_content_item'
 
 module GovukTaxonomyHelpers
-  class PublishingApiLinkedEditionParser
-    attr_accessor :linked_edition
+  class PublishingApiResponse
+    attr_accessor :linked_content_item
 
-    def initialize(edition_response, name_field: "title")
-      @linked_edition = LinkedEdition.new(
-        name: edition_response[name_field],
-        content_id: edition_response["content_id"],
-        base_path: edition_response["base_path"]
+    def initialize(content_item:, expanded_links:, name_field: "title")
+      @linked_content_item = LinkedContentItem.new(
+        name: content_item[name_field],
+        content_id: content_item["content_id"],
+        base_path: content_item["base_path"]
       )
 
       @name_field = name_field
+
+      add_expanded_links(expanded_links)
     end
+
+  private
 
     def add_expanded_links(expanded_links_response)
       child_taxons = expanded_links_response["expanded_links"]["child_taxons"]
@@ -21,7 +25,7 @@ module GovukTaxonomyHelpers
 
       if !child_taxons.nil?
         child_nodes = child_taxons.each do |child|
-          linked_edition << parse_nested_child(child)
+          linked_content_item << parse_nested_child(child)
         end
       end
 
@@ -29,23 +33,21 @@ module GovukTaxonomyHelpers
         # Assume no taxon has multiple parents
         single_parent = parent_taxons.first
 
-        parse_nested_parent(single_parent) << linked_edition
+        parse_nested_parent(single_parent) << linked_content_item
       end
 
       if !taxons.nil?
         taxon_nodes = taxons.each do |taxon|
           taxon_node = parse_nested_parent(taxon)
-          linked_edition.add_taxon(taxon_node)
+          linked_content_item.add_taxon(taxon_node)
         end
       end
     end
 
-    private
-
       attr_reader :name_field
 
       def parse_nested_child(nested_item)
-        nested_linked_edition = LinkedEdition.new(
+        nested_linked_content_item = LinkedContentItem.new(
           name: nested_item[name_field],
           content_id: nested_item["content_id"],
           base_path: nested_item["base_path"]
@@ -55,15 +57,15 @@ module GovukTaxonomyHelpers
 
         if !child_taxons.nil?
           child_nodes = child_taxons.each do |child|
-            nested_linked_edition << parse_nested_child(child)
+            nested_linked_content_item << parse_nested_child(child)
           end
         end
 
-        nested_linked_edition
+        nested_linked_content_item
       end
 
       def parse_nested_parent(nested_item)
-        nested_linked_edition = LinkedEdition.new(
+        nested_linked_content_item = LinkedContentItem.new(
           name: nested_item[name_field],
           content_id: nested_item["content_id"],
           base_path: nested_item["base_path"]
@@ -73,10 +75,10 @@ module GovukTaxonomyHelpers
 
         if !parent_taxons.nil?
           single_parent = parent_taxons.first
-          parse_nested_parent(single_parent) << nested_linked_edition
+          parse_nested_parent(single_parent) << nested_linked_content_item
         end
 
-        nested_linked_edition
+        nested_linked_content_item
       end
   end
 end
