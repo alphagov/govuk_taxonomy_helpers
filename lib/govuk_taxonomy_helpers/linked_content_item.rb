@@ -1,4 +1,12 @@
 module GovukTaxonomyHelpers
+
+  # A LinkedContentItem can be anything that has a content store representation
+  # on GOV.UK.
+  #
+  # It can be used with "taxon" content items (a topic in the taxonomy) or
+  # other document types that link to taxons.
+  #
+  # Taxon instances can have an optional parent and any number of child taxons.
   class LinkedContentItem
     extend Forwardable
     attr_reader :name, :content_id, :base_path, :children
@@ -6,6 +14,9 @@ module GovukTaxonomyHelpers
     attr_reader :taxons
     def_delegators :tree, :map, :each
 
+    # @param name [String] an internal or external name for the content item
+    # @param base_path [String] the relative URL, starting with a leading "/"
+    # @param content_id [UUID] unique identifier of the content item
     def initialize(name:, base_path:, content_id:)
       @name = name
       @content_id = content_id
@@ -14,11 +25,15 @@ module GovukTaxonomyHelpers
       @taxons = []
     end
 
+    # Add a LinkedContentItem as a child of this one
     def <<(child_node)
       child_node.parent = self
       @children << child_node
     end
 
+    # Get taxons in the taxon's branch of the taxonomy.
+    #
+    # @return [Array] all taxons in this branch of the taxonomy, including the content item itself
     def tree
       return [self] if @children.empty?
 
@@ -27,10 +42,17 @@ module GovukTaxonomyHelpers
       end
     end
 
+
+    # Get descendants of a taxon
+    #
+    # @return [Array] all taxons in this branch of the taxonomy, excluding the content item itself
     def descendants
       tree.tap(&:shift)
     end
 
+    # Get ancestors of a taxon
+    #
+    # @return [Array] all taxons in the path from the root of the taxonomy to the parent taxon
     def ancestors
       if parent.nil?
         []
@@ -39,31 +61,44 @@ module GovukTaxonomyHelpers
       end
     end
 
+    # Get a breadcrumb trail for a taxon
+    #
+    # @return [Array] all taxons in the path from the root of the taxonomy to this taxon
     def breadcrumb_trail
       ancestors + [self]
     end
 
+    # Get all linked taxons and their ancestors
+    #
+    # @return [Array] all taxons that this content item can be found in
     def taxons_with_ancestors
       taxons.flat_map(&:breadcrumb_trail)
     end
 
+    # @return [Integer] the number of taxons in this branch of the taxonomy
     def count
       tree.count
     end
 
+    # @return [Boolean] whether this taxon is the root of its taxonomy
     def root?
       parent.nil?
     end
 
+    # @return [Integer] the number of taxons between this taxon and the taxonomy root
     def depth
       return 0 if root?
       1 + parent.depth
     end
 
+    # Link this content item to a taxon
+    #
+    # @param taxon_node [LinkedContentItem] A taxon content item
     def add_taxon(taxon_node)
       taxons << taxon_node
     end
 
+    # @return [String] the string representation of the content item
     def inspect
       "LinkedContentItem(name: #{name}, content_id: #{content_id}, base_path: #{base_path})"
     end

@@ -41,29 +41,41 @@ A `LinkedContentItem` built from a taxon can access all *narrower term* taxons b
 A taxon may have many child taxons, but can only have one or zero parents.
 
 ```ruby
-puts taxonomy.tree             # All taxons in this branch of the taxonomy
-puts taxonomy.descendants      # Just the taxons that fall under this one
-puts taxonomy.children         # All direct children
-puts taxonomy.parent           # The direct parent
-puts taxonomy.ancestors        # The path from the root of the taxonomy to the parent taxon
-puts taxonomy.breadcrumb_trail # The path from the root of the taxonomy to this taxon
+taxon.children
+# => [LinkedContentItem(name: child-1-id, ...), LinkedContentItem(name: child-2, ...)]
+
+taxon.parent
+# => LinkedContentItem(name: root, ...)
+
+taxon.breadcrumb_trail
+# => [LinkedContentItem(name: root, ...), LinkedContentItem(name: taxon, ...)]
 ```
 
 A `LinkedContentItem` built from an content_item that isn't a taxon can access all taxons associated with it.
 
 ```ruby
-puts taxonomy.taxons                # Directly tagged taxons
-puts taxonomy.taxons_with_ancestors # All taxons that the content can be found in
-puts taxonomy.parent                # nil
-puts taxonomy.children              # []
+content_item.taxons
+# => [LinkedContentItem(name: taxon, ...),
+#     LinkedContentItem(name: another-taxon, ...)]
+
+content_item.taxons_with_ancestors
+# => [LinkedContentItem(name: root, ...),
+#     LinkedContentItem(name: taxon-parent, ...),
+#     LinkedContentItem(name: taxon, ...),
+#     LinkedContentItem(name: another-taxon, ...)]
 ```
 
 ## Nomenclature
 
 - **Taxonomy**: The hierarchy of topics used to classify content by subject on GOV.UK. Not all content is tagged to the taxonomy. We are rolling out the taxonomy and navigation theme-by-theme.
 - **Taxon**: Any topic within the taxonomy.
-- **ContentItem**: A distinct version of a document. A taxon is also a type of content item.
+- **Content Item**: A distinct version of a document. A taxon is also a type of content item.
 
+## Documentation
+
+To run a Yard server locally to preview documentation, run:
+
+    $ bundle exec yard server --reload
 
 ## Contributing
 

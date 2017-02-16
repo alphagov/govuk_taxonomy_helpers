@@ -2,6 +2,14 @@ require 'govuk_taxonomy_helpers/linked_content_item'
 
 module GovukTaxonomyHelpers
   class LinkedContentItem
+    # Extract a LinkedContentItem from publishing api response data.
+    #
+    # @param content_item [Hash] Publishing API `get_content` response hash
+    # @param expanded_links [Hash] Publishing API `get_expanded_links` response hash
+    # @param name_field [String] The field to use for content item names
+    # @return [LinkedContentItem]
+    # @see http://www.rubydoc.info/gems/gds-api-adapters/GdsApi/PublishingApiV2#get_content-instance_method
+    # @see http://www.rubydoc.info/gems/gds-api-adapters/GdsApi%2FPublishingApiV2:get_expanded_links
     def self.from_publishing_api(content_item:, expanded_links:, name_field: "title")
       PublishingApiResponse.new(
         content_item: content_item,
