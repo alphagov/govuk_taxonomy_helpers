@@ -1,4 +1,3 @@
 require "govuk_taxonomy_helpers/version"
-
-module GovukTaxonomyHelpers
-end
+require "govuk_taxonomy_helpers/publishing_api_response"
+require "govuk_taxonomy_helpers/linked_content_item"
