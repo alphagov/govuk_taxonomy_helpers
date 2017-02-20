@@ -7,7 +7,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
       "content_id" => "64aadc14-9bca-40d9-abb4-4f21f9792a05",
       "base_path" => "/taxon",
       "title" => "Taxon",
-      "internal_name" => "My lovely taxon"
+      "details" => {
+        "internal_name" => "My lovely taxon"
+      }
     }
   end
 
@@ -24,7 +26,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "84aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/grandchild-1",
         "title" => "Grandchild 1",
-        "internal_name" => "Root > Child > Grandchild 1",
+        "details" => {
+          "internal_name" => "GC 1",
+        },
         "links" => {}
       }
 
@@ -32,7 +36,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "94aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/grandchild-2",
         "title" => "Grandchild 2",
-        "internal_name" => "Root > Child > Grandchild 2",
+        "details" => {
+          "internal_name" => "GC 2",
+        },
         "links" => {}
       }
 
@@ -40,7 +46,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "74aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/child-1",
         "title" => "Child 1",
-        "internal_name" => "Root > Child 1",
+        "details" => {
+          "internal_name" => "C 1",
+        },
         "links" => {
           "child_taxons" => [
             grandchild_1,
@@ -57,10 +65,16 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
       }
     end
 
-    it "parses each level of taxons" do
-      expect(linked_content_item.name).to eq("Taxon")
-      expect(linked_content_item.children.map(&:name)).to eq (['Child 1'])
-      expect(linked_content_item.children.first.children.map(&:name)).to eq(["Grandchild 1", "Grandchild 2"])
+    it "parses titles" do
+      expect(linked_content_item.title).to eq("Taxon")
+      expect(linked_content_item.children.map(&:title)).to eq (['Child 1'])
+      expect(linked_content_item.children.first.children.map(&:title)).to eq(["Grandchild 1", "Grandchild 2"])
+    end
+
+    it "parses internal names" do
+      expect(linked_content_item.internal_name).to eq("My lovely taxon")
+      expect(linked_content_item.children.map(&:internal_name)).to eq (['C 1'])
+      expect(linked_content_item.children.first.children.map(&:internal_name)).to eq(["GC 1", "GC 2"])
     end
   end
 
@@ -73,7 +87,7 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
     end
 
     it "parses each level of taxons" do
-      expect(linked_content_item.name).to eq("Taxon")
+      expect(linked_content_item.title).to eq("Taxon")
       expect(linked_content_item.children).to be_empty
     end
   end
@@ -84,7 +98,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "74aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/child-1",
         "title" => "Child 1",
-        "internal_name" => "Root > Child 1",
+        "details" => {
+          "internal_name" => "C 1",
+        },
         "links" => {}
       }
 
@@ -92,7 +108,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "84aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/child-2",
         "title" => "Child 2",
-        "internal_name" => "Root > Child 2",
+        "details" => {
+          "internal_name" => "C 2",
+        },
         "links" => {}
       }
 
@@ -105,8 +123,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
     end
 
     it "parses each level of taxons" do
-      expect(linked_content_item.name).to eq("Taxon")
-      expect(linked_content_item.children.map(&:name)).to eq(["Child 1", "Child 2"])
+      expect(linked_content_item.title).to eq("Taxon")
+      expect(linked_content_item.children.map(&:title)).to eq(["Child 1", "Child 2"])
       expect(linked_content_item.children.map(&:children)).to all(be_empty)
     end
   end
@@ -117,6 +135,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "84aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/grandparent-1",
         "title" => "Grandparent 1",
+        "details" => {
+          "internal_name" => "GP 1",
+        },
         "links" => {}
       }
 
@@ -124,6 +145,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "74aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/parent-1",
         "title" => "Parent 1",
+        "details" => {
+          "internal_name" => "P 1",
+        },
         "links" => {
           "parent_taxons" => [
             grandparent_1
@@ -140,9 +164,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
     end
 
     it "parses the ancestors" do
-      expect(linked_content_item.name).to eq("Taxon")
-      expect(linked_content_item.parent.name).to eq("Parent 1")
-      expect(linked_content_item.ancestors.map(&:name)).to eq(["Grandparent 1", "Parent 1"])
+      expect(linked_content_item.title).to eq("Taxon")
+      expect(linked_content_item.parent.title).to eq("Parent 1")
+      expect(linked_content_item.ancestors.map(&:title)).to eq(["Grandparent 1", "Parent 1"])
     end
   end
 
@@ -153,6 +177,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "74aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/parent-1",
         "title" => "Parent 1",
+        "details" => {
+          "internal_name" => "P 1",
+        },
         "links" => {}
       }
 
@@ -165,9 +192,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
     end
 
     it "parses the ancestors" do
-      expect(linked_content_item.name).to eq("Taxon")
-      expect(linked_content_item.parent.name).to eq("Parent 1")
-      expect(linked_content_item.ancestors.map(&:name)).to eq(["Parent 1"])
+      expect(linked_content_item.title).to eq("Taxon")
+      expect(linked_content_item.parent.title).to eq("Parent 1")
+      expect(linked_content_item.ancestors.map(&:title)).to eq(["Parent 1"])
     end
   end
 
@@ -180,9 +207,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
     end
 
     it "parses the ancestors" do
-      expect(linked_content_item.name).to eq("Taxon")
+      expect(linked_content_item.title).to eq("Taxon")
       expect(linked_content_item.parent).to be_nil
-      expect(linked_content_item.ancestors.map(&:name)).to be_empty
+      expect(linked_content_item.ancestors.map(&:title)).to be_empty
     end
   end
 
@@ -192,6 +219,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "74aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/parent-1",
         "title" => "Parent 1",
+        "details" => {
+          "internal_name" => "P 1",
+        },
         "links" => {}
       }
 
@@ -199,6 +229,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "84aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/parent-2",
         "title" => "Parent 2",
+        "details" => {
+          "internal_name" => "P 2",
+        },
         "links" => {}
       }
 
@@ -211,9 +244,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
     end
 
     it "uses only the first parent" do
-      expect(linked_content_item.name).to eq("Taxon")
-      expect(linked_content_item.parent.name).to eq("Parent 1")
-      expect(linked_content_item.ancestors.map(&:name)).to eq(["Parent 1"])
+      expect(linked_content_item.title).to eq("Taxon")
+      expect(linked_content_item.parent.title).to eq("Parent 1")
+      expect(linked_content_item.ancestors.map(&:title)).to eq(["Parent 1"])
     end
   end
 
@@ -223,6 +256,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "22aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/grandparent-1",
         "title" => "Grandparent 1",
+        "details" => {
+          "internal_name" => "GP 1",
+        },
         "links" => {}
       }
 
@@ -230,6 +266,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "11aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/parent-1",
         "title" => "Parent 1",
+        "details" => {
+          "internal_name" => "P 1",
+        },
         "links" => {
           "parent_taxons" => [grandparent_1]
         }
@@ -239,6 +278,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "00aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/this-is-a-taxon",
         "title" => "Taxon 1",
+        "details" => {
+          "internal_name" => "T 1",
+        },
         "links" => {
           "parent_taxons" => [parent_1]
         }
@@ -248,6 +290,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "03aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/grandparent-2",
         "title" => "Grandparent 2",
+        "details" => {
+          "internal_name" => "GP 2",
+        },
         "links" => {}
       }
 
@@ -255,6 +300,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "02aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/parent-2",
         "title" => "Parent 2",
+        "details" => {
+          "internal_name" => "P 2",
+        },
         "links" => {
           "parent_taxons" => [grandparent_2]
         }
@@ -264,6 +312,9 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "01aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/this-is-also-a-taxon",
         "title" => "Taxon 2",
+        "details" => {
+          "internal_name" => "T 2",
+        },
         "links" => {
           "parent_taxons" => [parent_2]
         }
@@ -279,8 +330,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
 
     it "parses the taxons and their ancestors" do
       expect(linked_content_item.parent).to be_nil
-      expect(linked_content_item.taxons.map(&:name)).to eq(["Taxon 1", "Taxon 2"])
-      expect(linked_content_item.taxons_with_ancestors.map(&:name).sort).to eq(
+      expect(linked_content_item.taxons.map(&:title)).to eq(["Taxon 1", "Taxon 2"])
+      expect(linked_content_item.taxons_with_ancestors.map(&:title).sort).to eq(
         [
           "Grandparent 1", "Grandparent 2",
           "Parent 1", "Parent 2",

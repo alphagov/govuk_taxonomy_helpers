@@ -6,15 +6,13 @@ module GovukTaxonomyHelpers
     #
     # @param content_item [Hash] Publishing API `get_content` response hash
     # @param expanded_links [Hash] Publishing API `get_expanded_links` response hash
-    # @param name_field [String] The field to use for content item names
     # @return [LinkedContentItem]
     # @see http://www.rubydoc.info/gems/gds-api-adapters/GdsApi/PublishingApiV2#get_content-instance_method
     # @see http://www.rubydoc.info/gems/gds-api-adapters/GdsApi%2FPublishingApiV2:get_expanded_links
-    def self.from_publishing_api(content_item:, expanded_links:, name_field: "title")
+    def self.from_publishing_api(content_item:, expanded_links:)
       PublishingApiResponse.new(
         content_item: content_item,
         expanded_links: expanded_links,
-        name_field: name_field
       ).linked_content_item
     end
   end
@@ -22,14 +20,13 @@ module GovukTaxonomyHelpers
   class PublishingApiResponse
     attr_accessor :linked_content_item
 
-    def initialize(content_item:, expanded_links:, name_field: "title")
+    def initialize(content_item:, expanded_links:)
       @linked_content_item = LinkedContentItem.new(
-        name: content_item[name_field],
+        title: content_item["title"],
+        internal_name: content_item["details"]["internal_name"],
         content_id: content_item["content_id"],
         base_path: content_item["base_path"]
       )
-
-      @name_field = name_field
 
       add_expanded_links(expanded_links)
     end
@@ -62,41 +59,41 @@ module GovukTaxonomyHelpers
       end
     end
 
-      attr_reader :name_field
+    def parse_nested_child(nested_item)
+      nested_linked_content_item = LinkedContentItem.new(
+        title: nested_item["title"],
+        internal_name: nested_item["details"]["internal_name"],
+        content_id: nested_item["content_id"],
+        base_path: nested_item["base_path"]
+      )
 
-      def parse_nested_child(nested_item)
-        nested_linked_content_item = LinkedContentItem.new(
-          name: nested_item[name_field],
-          content_id: nested_item["content_id"],
-          base_path: nested_item["base_path"]
-        )
+      child_taxons = nested_item["links"]["child_taxons"]
 
-        child_taxons = nested_item["links"]["child_taxons"]
-
-        if !child_taxons.nil?
-          child_nodes = child_taxons.each do |child|
-            nested_linked_content_item << parse_nested_child(child)
-          end
+      if !child_taxons.nil?
+        child_nodes = child_taxons.each do |child|
+          nested_linked_content_item << parse_nested_child(child)
         end
-
-        nested_linked_content_item
       end
 
-      def parse_nested_parent(nested_item)
-        nested_linked_content_item = LinkedContentItem.new(
-          name: nested_item[name_field],
-          content_id: nested_item["content_id"],
-          base_path: nested_item["base_path"]
-        )
+      nested_linked_content_item
+    end
 
-        parent_taxons = nested_item["links"]["parent_taxons"]
+    def parse_nested_parent(nested_item)
+      nested_linked_content_item = LinkedContentItem.new(
+        title: nested_item["title"],
+        internal_name: nested_item["details"]["internal_name"],
+        content_id: nested_item["content_id"],
+        base_path: nested_item["base_path"]
+      )
 
-        if !parent_taxons.nil?
-          single_parent = parent_taxons.first
-          parse_nested_parent(single_parent) << nested_linked_content_item
-        end
+      parent_taxons = nested_item["links"]["parent_taxons"]
 
-        nested_linked_content_item
+      if !parent_taxons.nil?
+        single_parent = parent_taxons.first
+        parse_nested_parent(single_parent) << nested_linked_content_item
       end
+
+      nested_linked_content_item
+    end
   end
 end

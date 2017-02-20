@@ -42,27 +42,27 @@ A taxon may have many child taxons, but can only have one or zero parents.
 
 ```ruby
 taxon.children
-# => [LinkedContentItem(name: child-1-id, ...), LinkedContentItem(name: child-2, ...)]
+# => [LinkedContentItem(title: child-1-id, ...), LinkedContentItem(title: child-2, ...)]
 
 taxon.parent
-# => LinkedContentItem(name: root, ...)
+# => LinkedContentItem(title: root, ...)
 
 taxon.breadcrumb_trail
-# => [LinkedContentItem(name: root, ...), LinkedContentItem(name: taxon, ...)]
+# => [LinkedContentItem(title: root, ...), LinkedContentItem(title: taxon, ...)]
 ```
 
 A `LinkedContentItem` built from an content_item that isn't a taxon can access all taxons associated with it.
 
 ```ruby
 content_item.taxons
-# => [LinkedContentItem(name: taxon, ...),
-#     LinkedContentItem(name: another-taxon, ...)]
+# => [LinkedContentItem(title: taxon, ...),
+#     LinkedContentItem(title: another-taxon, ...)]
 
 content_item.taxons_with_ancestors
-# => [LinkedContentItem(name: root, ...),
-#     LinkedContentItem(name: taxon-parent, ...),
-#     LinkedContentItem(name: taxon, ...),
-#     LinkedContentItem(name: another-taxon, ...)]
+# => [LinkedContentItem(title: root, ...),
+#     LinkedContentItem(title: taxon-parent, ...),
+#     LinkedContentItem(title: taxon, ...),
+#     LinkedContentItem(title: another-taxon, ...)]
 ```
 
 ## Nomenclature
