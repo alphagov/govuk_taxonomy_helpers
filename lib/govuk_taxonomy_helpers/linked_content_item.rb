@@ -1,5 +1,4 @@
 module GovukTaxonomyHelpers
-
   # A LinkedContentItem can be anything that has a content store representation
   # on GOV.UK.
   #
@@ -9,16 +8,18 @@ module GovukTaxonomyHelpers
   # Taxon instances can have an optional parent and any number of child taxons.
   class LinkedContentItem
     extend Forwardable
-    attr_reader :name, :content_id, :base_path, :children
+    attr_reader :title, :content_id, :base_path, :children, :internal_name
     attr_accessor :parent
     attr_reader :taxons
     def_delegators :tree, :map, :each
 
-    # @param name [String] an internal or external name for the content item
+    # @param title [String] the user facing name for the content item
     # @param base_path [String] the relative URL, starting with a leading "/"
     # @param content_id [UUID] unique identifier of the content item
-    def initialize(name:, base_path:, content_id:)
-      @name = name
+    # @param internal_name [String] an internal name for the content item
+    def initialize(title:, base_path:, content_id:, internal_name: nil)
+      @title = title
+      @internal_name = internal_name
       @content_id = content_id
       @base_path = base_path
       @children = []
@@ -100,7 +101,11 @@ module GovukTaxonomyHelpers
 
     # @return [String] the string representation of the content item
     def inspect
-      "LinkedContentItem(name: #{name}, content_id: #{content_id}, base_path: #{base_path})"
+      if internal_name.nil?
+        "LinkedContentItem(title: '#{title}', content_id: '#{content_id}', base_path: '#{base_path}')"
+      else
+        "LinkedContentItem(title: '#{title}', internal_name: '#{internal_name}', content_id: '#{content_id}', base_path: '#{base_path}')"
+      end
     end
   end
 end
