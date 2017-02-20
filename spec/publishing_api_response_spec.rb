@@ -67,13 +67,13 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
 
     it "parses titles" do
       expect(linked_content_item.title).to eq("Taxon")
-      expect(linked_content_item.children.map(&:title)).to eq (['Child 1'])
+      expect(linked_content_item.children.map(&:title)).to eq(['Child 1'])
       expect(linked_content_item.children.first.children.map(&:title)).to eq(["Grandchild 1", "Grandchild 2"])
     end
 
     it "parses internal names" do
       expect(linked_content_item.internal_name).to eq("My lovely taxon")
-      expect(linked_content_item.children.map(&:internal_name)).to eq (['C 1'])
+      expect(linked_content_item.children.map(&:internal_name)).to eq(['C 1'])
       expect(linked_content_item.children.first.children.map(&:internal_name)).to eq(["GC 1", "GC 2"])
     end
   end

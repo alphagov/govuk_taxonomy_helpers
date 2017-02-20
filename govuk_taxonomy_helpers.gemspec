@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = GovukTaxonomyHelpers::VERSION
   spec.authors       = ["Mat Moore"]
   spec.email         = ["mat.moore@digital.cabinet-office.gov.uk"]
-  spec.summary       = %q{Parses the taxonomy of GOV.UK into a browseable tree structure.}
+  spec.summary       = "Parses the taxonomy of GOV.UK into a browseable tree structure."
   spec.homepage      = "https://github.com/alphagov/govuk_taxonomy_helpers"
   spec.license       = "MIT"
 

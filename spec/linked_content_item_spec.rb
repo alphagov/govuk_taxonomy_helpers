@@ -73,7 +73,13 @@ RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
   end
 
   context "taxon with ancestors" do
-    let(:child_node_2) {GovukTaxonomyHelpers::LinkedContentItem.new(title: "child-2-id", content_id: "abc", base_path: "/child-2-id")}
+    let(:child_node_2) do
+      GovukTaxonomyHelpers::LinkedContentItem.new(
+        title: "child-2-id",
+        content_id: "abc",
+        base_path: "/child-2-id"
+      )
+    end
 
     before do
       root_node << child_node_1
@@ -111,9 +117,9 @@ RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
     describe "#taxons" do
       let(:content_item) do
         GovukTaxonomyHelpers::LinkedContentItem.new(
-        title: "content",
-        content_id: "abc",
-        base_path: "/content"
+          title: "content",
+          content_id: "abc",
+          base_path: "/content"
         )
       end
 
@@ -127,17 +133,17 @@ RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
     describe "#taxons_with_ancestors" do
       let(:another_taxon) do
         GovukTaxonomyHelpers::LinkedContentItem.new(
-        title: "another-taxon",
-        content_id: "abc",
-        base_path: "/another-taxon"
+          title: "another-taxon",
+          content_id: "abc",
+          base_path: "/another-taxon"
         )
       end
 
       let(:content_item) do
         GovukTaxonomyHelpers::LinkedContentItem.new(
-        title: "content",
-        content_id: "abc",
-        base_path: "/content"
+          title: "content",
+          content_id: "abc",
+          base_path: "/content"
         )
       end
 
