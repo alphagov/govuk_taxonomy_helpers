@@ -1,5 +1,7 @@
 #!/usr/bin/env groovy
 
+REPOSITORY = 'govuk_taxonomy_helpers'
+
 node {
   def govuk = load '/var/lib/jenkins/groovy_scripts/govuk_jenkinslib.groovy'
 
@@ -23,6 +25,12 @@ node {
 
     stage('Tests') {
       govuk.runTests('spec')
+    }
+
+    if(env.BRANCH_NAME == "master") {
+      stage('Publish Gem') {
+        govuk.publishGem(REPOSITORY, env.BRANCH_NAME)
+      }
     }
 
   } catch (e) {
