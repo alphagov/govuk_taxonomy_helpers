@@ -1,2 +1,8 @@
 AllCops:
   TargetRubyVersion: 2.3
+
+Style/VariableNumber:
+  Enabled: false
+
+Style/SafeNavigation:
+  Enabled: false

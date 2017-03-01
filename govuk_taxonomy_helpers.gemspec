@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "rspec", "~> 3.5"
   spec.add_development_dependency "gem_publisher", "~> 1.5.0"
-  spec.add_development_dependency "govuk-lint", "~> 1.2.1"
+  spec.add_development_dependency "govuk-lint", "~> 2.0.0"
   spec.add_development_dependency "pry-byebug", "~> 3.4"
   spec.add_development_dependency "yard", "~> 0.9.8"
 end
