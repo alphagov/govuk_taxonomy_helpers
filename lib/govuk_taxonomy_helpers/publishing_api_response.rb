@@ -20,6 +20,8 @@ module GovukTaxonomyHelpers
   class PublishingApiResponse
     attr_accessor :linked_content_item
 
+    # @param content_item [Hash] Publishing API `get_content` response hash
+    # @param expanded_links [Hash] Publishing API `get_expanded_links` response hash
     def initialize(content_item:, expanded_links:)
       @linked_content_item = LinkedContentItem.new(
         title: content_item["title"],

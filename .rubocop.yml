@@ -1,2 +1,12 @@
 AllCops:
   TargetRubyVersion: 2.3
+
+# Method documentation is required to ensure the gem is fully documented
+Style/DocumentationMethod:
+  Enabled: true
+
+Style/VariableNumber:
+  Enabled: false
+
+Style/SafeNavigation:
+  Enabled: false
