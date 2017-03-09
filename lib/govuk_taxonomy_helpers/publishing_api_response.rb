@@ -23,9 +23,11 @@ module GovukTaxonomyHelpers
     # @param content_item [Hash] Publishing API `get_content` response hash
     # @param expanded_links [Hash] Publishing API `get_expanded_links` response hash
     def initialize(content_item:, expanded_links:)
+      details = content_item["details"] || {}
+
       @linked_content_item = LinkedContentItem.new(
         title: content_item["title"],
-        internal_name: content_item["details"]["internal_name"],
+        internal_name: details["internal_name"],
         content_id: content_item["content_id"],
         base_path: content_item["base_path"]
       )
@@ -62,14 +64,17 @@ module GovukTaxonomyHelpers
     end
 
     def parse_nested_child(nested_item)
+      details = nested_item["details"] || {}
+      links = nested_item["links"] || {}
+
       nested_linked_content_item = LinkedContentItem.new(
         title: nested_item["title"],
-        internal_name: nested_item["details"]["internal_name"],
+        internal_name: details["internal_name"],
         content_id: nested_item["content_id"],
         base_path: nested_item["base_path"]
       )
 
-      child_taxons = nested_item["links"]["child_taxons"]
+      child_taxons = links["child_taxons"]
 
       if !child_taxons.nil?
         child_taxons.each do |child|
@@ -81,14 +86,17 @@ module GovukTaxonomyHelpers
     end
 
     def parse_nested_parent(nested_item)
+      details = nested_item["details"] || {}
+      links = nested_item["links"] || {}
+
       nested_linked_content_item = LinkedContentItem.new(
         title: nested_item["title"],
-        internal_name: nested_item["details"]["internal_name"],
+        internal_name: details["internal_name"],
         content_id: nested_item["content_id"],
         base_path: nested_item["base_path"]
       )
 
-      parent_taxons = nested_item["links"]["parent_taxons"]
+      parent_taxons = links["parent_taxons"]
 
       if !parent_taxons.nil?
         single_parent = parent_taxons.first

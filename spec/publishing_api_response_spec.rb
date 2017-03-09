@@ -340,4 +340,66 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
       )
     end
   end
+
+  context "minimal responses with missing links and details hashes" do
+    let(:minimal_taxon) do
+      grandchild_1 = {
+        "content_id" => "84aadc14-9bca-40d9-abb4-4f21f9792a05",
+        "base_path" => "/grandchild-1",
+        "title" => "Grandchild 1",
+      }
+
+      grandchild_2 = {
+        "content_id" => "94aadc14-9bca-40d9-abb4-4f21f9792a05",
+        "base_path" => "/grandchild-2",
+        "title" => "Grandchild 2",
+      }
+
+      child_1 = {
+        "content_id" => "74aadc14-9bca-40d9-abb4-4f21f9792a05",
+        "base_path" => "/child-1",
+        "title" => "Child 1",
+        "links" => {
+          "child_taxons" => [
+            grandchild_1,
+            grandchild_2
+          ]
+        }
+      }
+
+      content_item = {
+        "content_id" => "aaaaaa14-9bca-40d9-abb4-4f21f9792a05",
+        "base_path" => "/minimal-taxon",
+        "title" => "Minimal Taxon",
+      }
+
+      expanded_links = {
+        "content_id" => "64aadc14-9bca-40d9-abb4-4f21f9792a05",
+        "expanded_links" => {
+          "child_taxons" => [child_1],
+          "parent_taxons" => [
+            {
+              "content_id" => "ffaadc14-9bca-40d9-abb4-4f21f9792aff",
+              "title" => "Parent Taxon",
+              "base_path" => "/parent"
+            }
+          ]
+        }
+      }
+
+      GovukTaxonomyHelpers::LinkedContentItem.from_publishing_api(
+        content_item: content_item,
+        expanded_links: expanded_links
+      )
+    end
+
+    it "parses taxons with nil internal names" do
+      expect(minimal_taxon.title).to eq("Minimal Taxon")
+      expect(minimal_taxon.internal_name).to be_nil
+      expect(minimal_taxon.parent.title).to eq("Parent Taxon")
+      expect(minimal_taxon.parent.internal_name).to be_nil
+      expect(minimal_taxon.descendants.map(&:title)).to eq(["Child 1", "Grandchild 1", "Grandchild 2"])
+      expect(minimal_taxon.descendants.map(&:internal_name)).to all(be_nil)
+    end
+  end
 end
