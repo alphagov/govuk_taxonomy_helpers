@@ -2,8 +2,8 @@ require_relative 'spec_helper'
 require 'govuk_taxonomy_helpers/linked_content_item'
 
 RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
-  let(:root_node) { GovukTaxonomyHelpers::LinkedContentItem.new(title: "root-id", content_id: "abc", base_path: "/root-id") }
-  let(:child_node_1) { GovukTaxonomyHelpers::LinkedContentItem.new(title: "child-1-id", content_id: "abc", base_path: "/child-1-id") }
+  let(:root_node) { GovukTaxonomyHelpers::LinkedContentItem.new(title: "root-id", content_id: "abc", base_path: "/root-id", draft: false) }
+  let(:child_node_1) { GovukTaxonomyHelpers::LinkedContentItem.new(title: "child-1-id", content_id: "abc", base_path: "/child-1-id", draft: false) }
 
   describe "#<<(child_node)" do
     it "makes one node the child of another node" do
@@ -17,8 +17,8 @@ RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
   describe "#tree" do
     context "given a node with a tree of successors" do
       it "returns an array representing a pre-order traversal of the tree" do
-        child_node_2 = GovukTaxonomyHelpers::LinkedContentItem.new(title: "child-2-id", content_id: "abc", base_path: "/child-2-id")
-        child_node_3 = GovukTaxonomyHelpers::LinkedContentItem.new(title: "child-3-id", content_id: "abc", base_path: "/child-3-id")
+        child_node_2 = GovukTaxonomyHelpers::LinkedContentItem.new(title: "child-2-id", content_id: "abc", base_path: "/child-2-id", draft: false)
+        child_node_3 = GovukTaxonomyHelpers::LinkedContentItem.new(title: "child-3-id", content_id: "abc", base_path: "/child-3-id", draft: false)
 
         root_node << child_node_1
         child_node_1 << child_node_3
@@ -54,7 +54,7 @@ RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
 
   describe "#depth" do
     it "returns the depth of the node in its tree" do
-      child_node_2 = GovukTaxonomyHelpers::LinkedContentItem.new(title: "child-2-id", content_id: "abc", base_path: "/child-2-id")
+      child_node_2 = GovukTaxonomyHelpers::LinkedContentItem.new(title: "child-2-id", content_id: "abc", base_path: "/child-2-id", draft: false)
       root_node << child_node_1
       child_node_1 << child_node_2
 
@@ -77,7 +77,8 @@ RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
       GovukTaxonomyHelpers::LinkedContentItem.new(
         title: "child-2-id",
         content_id: "abc",
-        base_path: "/child-2-id"
+        base_path: "/child-2-id",
+        draft: false
       )
     end
 
@@ -119,7 +120,8 @@ RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
         GovukTaxonomyHelpers::LinkedContentItem.new(
           title: "content",
           content_id: "abc",
-          base_path: "/content"
+          base_path: "/content",
+          draft: false
         )
       end
 
@@ -135,7 +137,8 @@ RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
         GovukTaxonomyHelpers::LinkedContentItem.new(
           title: "another-taxon",
           content_id: "abc",
-          base_path: "/another-taxon"
+          base_path: "/another-taxon",
+          draft: false
         )
       end
 
@@ -143,7 +146,8 @@ RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
         GovukTaxonomyHelpers::LinkedContentItem.new(
           title: "content",
           content_id: "abc",
-          base_path: "/content"
+          base_path: "/content",
+          draft: false
         )
       end
 

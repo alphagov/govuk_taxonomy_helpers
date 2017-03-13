@@ -8,7 +8,7 @@ module GovukTaxonomyHelpers
   # Taxon instances can have an optional parent and any number of child taxons.
   class LinkedContentItem
     extend Forwardable
-    attr_reader :title, :content_id, :base_path, :children, :internal_name
+    attr_reader :title, :content_id, :base_path, :children, :internal_name, :draft
     attr_accessor :parent
     attr_reader :taxons
     def_delegators :tree, :map, :each
@@ -17,11 +17,13 @@ module GovukTaxonomyHelpers
     # @param base_path [String] the relative URL, starting with a leading "/"
     # @param content_id [UUID] unique identifier of the content item
     # @param internal_name [String] an internal name for the content item
-    def initialize(title:, base_path:, content_id:, internal_name: nil)
+    # @param draft [Boolean] whether the content item is a draft
+    def initialize(title:, base_path:, content_id:, internal_name: nil, draft:)
       @title = title
       @internal_name = internal_name
       @content_id = content_id
       @base_path = base_path
+      @draft = draft
       @children = []
       @taxons = []
     end
@@ -102,9 +104,9 @@ module GovukTaxonomyHelpers
     # @return [String] the string representation of the content item
     def inspect
       if internal_name.nil?
-        "LinkedContentItem(title: '#{title}', content_id: '#{content_id}', base_path: '#{base_path}')"
+        "LinkedContentItem(title: '#{title}', content_id: '#{content_id}', base_path: '#{base_path}', draft: '#{draft}')"
       else
-        "LinkedContentItem(title: '#{title}', internal_name: '#{internal_name}', content_id: '#{content_id}', base_path: '#{base_path}')"
+        "LinkedContentItem(title: '#{title}', internal_name: '#{internal_name}', content_id: '#{content_id}', base_path: '#{base_path}', draft: '#{draft}')"
       end
     end
   end
