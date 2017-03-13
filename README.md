@@ -70,6 +70,7 @@ content_item.taxons_with_ancestors
 - **Taxonomy**: The hierarchy of topics used to classify content by subject on GOV.UK. Not all content is tagged to the taxonomy. We are rolling out the taxonomy and navigation theme-by-theme.
 - **Taxon**: Any topic within the taxonomy.
 - **Content Item**: A distinct version of a document. A taxon is also a type of content item.
+- **Draft**: A content item which has not yet been published. Draft taxons do not appear on the live site but can have documents tagged to them.
 
 ## Documentation
 

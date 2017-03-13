@@ -29,7 +29,8 @@ module GovukTaxonomyHelpers
         title: content_item["title"],
         internal_name: details["internal_name"],
         content_id: content_item["content_id"],
-        base_path: content_item["base_path"]
+        base_path: content_item["base_path"],
+        draft: content_item["draft"]
       )
 
       add_expanded_links(expanded_links)
@@ -71,7 +72,8 @@ module GovukTaxonomyHelpers
         title: nested_item["title"],
         internal_name: details["internal_name"],
         content_id: nested_item["content_id"],
-        base_path: nested_item["base_path"]
+        base_path: nested_item["base_path"],
+        draft: nested_item["draft"]
       )
 
       child_taxons = links["child_taxons"]
@@ -93,7 +95,8 @@ module GovukTaxonomyHelpers
         title: nested_item["title"],
         internal_name: details["internal_name"],
         content_id: nested_item["content_id"],
-        base_path: nested_item["base_path"]
+        base_path: nested_item["base_path"],
+        draft: nested_item["draft"]
       )
 
       parent_taxons = links["parent_taxons"]

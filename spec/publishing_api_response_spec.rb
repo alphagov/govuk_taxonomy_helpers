@@ -29,7 +29,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "details" => {
           "internal_name" => "GC 1",
         },
-        "links" => {}
+        "links" => {},
+        "draft" => false
       }
 
       grandchild_2 = {
@@ -39,7 +40,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "details" => {
           "internal_name" => "GC 2",
         },
-        "links" => {}
+        "links" => {},
+        "draft" => false
       }
 
       child_1 = {
@@ -54,7 +56,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
             grandchild_1,
             grandchild_2
           ]
-        }
+        },
+        "draft" => false
       }
 
       {
@@ -101,7 +104,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "details" => {
           "internal_name" => "C 1",
         },
-        "links" => {}
+        "links" => {},
+        "draft" => false
       }
 
       child_2 = {
@@ -111,7 +115,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "details" => {
           "internal_name" => "C 2",
         },
-        "links" => {}
+        "links" => {},
+        "draft" => false
       }
 
       {
@@ -138,7 +143,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "details" => {
           "internal_name" => "GP 1",
         },
-        "links" => {}
+        "links" => {},
+        "draft" => false
       }
 
       parent_1 = {
@@ -152,7 +158,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
           "parent_taxons" => [
             grandparent_1
           ]
-        }
+        },
+        "draft" => false
       }
 
       {
@@ -180,7 +187,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "details" => {
           "internal_name" => "P 1",
         },
-        "links" => {}
+        "links" => {},
+        "draft" => false
       }
 
       {
@@ -222,7 +230,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "details" => {
           "internal_name" => "P 1",
         },
-        "links" => {}
+        "links" => {},
+        "draft" => false
       }
 
       parent_2 = {
@@ -232,7 +241,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "details" => {
           "internal_name" => "P 2",
         },
-        "links" => {}
+        "links" => {},
+        "draft" => false
       }
 
       {
@@ -259,7 +269,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "details" => {
           "internal_name" => "GP 1",
         },
-        "links" => {}
+        "links" => {},
+        "draft" => false
       }
 
       parent_1 = {
@@ -271,7 +282,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         },
         "links" => {
           "parent_taxons" => [grandparent_1]
-        }
+        },
+        "draft" => false
       }
 
       taxon_1 = {
@@ -283,7 +295,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         },
         "links" => {
           "parent_taxons" => [parent_1]
-        }
+        },
+        "draft" => false
       }
 
       grandparent_2 = {
@@ -305,7 +318,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         },
         "links" => {
           "parent_taxons" => [grandparent_2]
-        }
+        },
+        "draft" => false
       }
 
       taxon_2 = {
@@ -317,7 +331,8 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         },
         "links" => {
           "parent_taxons" => [parent_2]
-        }
+        },
+        "draft" => false
       }
 
       {
@@ -347,12 +362,14 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         "content_id" => "84aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/grandchild-1",
         "title" => "Grandchild 1",
+        "draft" => false,
       }
 
       grandchild_2 = {
         "content_id" => "94aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/grandchild-2",
         "title" => "Grandchild 2",
+        "draft" => false,
       }
 
       child_1 = {
@@ -364,13 +381,15 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
             grandchild_1,
             grandchild_2
           ]
-        }
+        },
+        "draft" => false
       }
 
       content_item = {
         "content_id" => "aaaaaa14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/minimal-taxon",
         "title" => "Minimal Taxon",
+        "draft" => false,
       }
 
       expanded_links = {
