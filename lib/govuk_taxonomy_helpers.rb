@@ -1,3 +1,5 @@
 require "govuk_taxonomy_helpers/version"
-require "govuk_taxonomy_helpers/publishing_api_response"
-require "govuk_taxonomy_helpers/linked_content_item"
+require "govuk_taxonomy_helpers/publishing_api_content_item"
+require "govuk_taxonomy_helpers/publishing_api_expanded_links"
+require "govuk_taxonomy_helpers/taxon"
+require "govuk_taxonomy_helpers/tagging"
