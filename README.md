@@ -36,6 +36,12 @@ taxonomy = GovukTaxonomyHelpers::LinkedContentItem.from_publishing_api(
 )
 ```
 
+Message queue workers can also pass the fully expanded content item hash:
+
+```ruby
+taxonomy = GovukTaxonomyHelpers::LinkedContentItem.from_publishing_api_downstream(content_item)
+```
+
 A `LinkedContentItem` built from a taxon can access all *narrower term* taxons below it and all *broader term* taxons above it.
 
 A taxon may have many child taxons, but can only have one or zero parents.
@@ -51,7 +57,7 @@ taxon.breadcrumb_trail
 # => [LinkedContentItem(title: root, ...), LinkedContentItem(title: taxon, ...)]
 ```
 
-A `LinkedContentItem` built from an content_item that isn't a taxon can access all taxons associated with it.
+A `LinkedContentItem` built from a content item that isn't a taxon can access all taxons associated with it.
 
 ```ruby
 content_item.taxons

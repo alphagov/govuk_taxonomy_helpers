@@ -1,27 +1,25 @@
 module GovukTaxonomyHelpers
-  # A LinkedContentItem can be anything that has a content store representation
-  # on GOV.UK.
-  #
-  # It can be used with "taxon" content items (a topic in the taxonomy) or
-  # other document types that link to taxons.
-  #
-  # Taxon instances can have an optional parent and any number of child taxons.
-  class LinkedContentItem
+  class Taxon
     extend Forwardable
-    attr_reader :title, :content_id, :base_path, :children, :internal_name
+
     attr_accessor :parent
-    attr_reader :taxons
+    attr_reader :children
+    attr_reader :title
+    attr_reader :content_id
+    attr_reader :base_path
+    attr_reader :internal_name
+
     def_delegators :tree, :map, :each
 
     # @param title [String] the user facing name for the content item
     # @param base_path [String] the relative URL, starting with a leading "/"
     # @param content_id [UUID] unique identifier of the content item
     # @param internal_name [String] an internal name for the content item
-    def initialize(title:, base_path:, content_id:, internal_name: nil)
+    def initialize(title:, base_path:, content_id:, internal_name: nil, **kwargs)
       @title = title
-      @internal_name = internal_name
       @content_id = content_id
       @base_path = base_path
+      @internal_name = internal_name
       @children = []
       @taxons = []
     end
@@ -42,7 +40,6 @@ module GovukTaxonomyHelpers
         tree.concat(child.tree)
       end
     end
-
 
     # Get descendants of a taxon
     #
@@ -69,13 +66,6 @@ module GovukTaxonomyHelpers
       ancestors + [self]
     end
 
-    # Get all linked taxons and their ancestors
-    #
-    # @return [Array] all taxons that this content item can be found in
-    def taxons_with_ancestors
-      taxons.flat_map(&:breadcrumb_trail)
-    end
-
     # @return [Integer] the number of taxons in this branch of the taxonomy
     def count
       tree.count
@@ -92,20 +82,9 @@ module GovukTaxonomyHelpers
       1 + parent.depth
     end
 
-    # Link this content item to a taxon
-    #
-    # @param taxon_node [LinkedContentItem] A taxon content item
-    def add_taxon(taxon_node)
-      taxons << taxon_node
-    end
-
     # @return [String] the string representation of the content item
     def inspect
-      if internal_name.nil?
-        "LinkedContentItem(title: '#{title}', content_id: '#{content_id}', base_path: '#{base_path}')"
-      else
-        "LinkedContentItem(title: '#{title}', internal_name: '#{internal_name}', content_id: '#{content_id}', base_path: '#{base_path}')"
-      end
+      "Taxon(title: '#{title}', internal_name: '#{internal_name}', content_id: '#{content_id}', base_path: '#{base_path}')"
     end
   end
 end

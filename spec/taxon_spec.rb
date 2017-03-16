@@ -1,9 +1,9 @@
 require_relative 'spec_helper'
-require 'govuk_taxonomy_helpers/linked_content_item'
+require 'govuk_taxonomy_helpers/taxon'
 
-RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
-  let(:root_node) { GovukTaxonomyHelpers::LinkedContentItem.new(title: "root-id", content_id: "abc", base_path: "/root-id") }
-  let(:child_node_1) { GovukTaxonomyHelpers::LinkedContentItem.new(title: "child-1-id", content_id: "abc", base_path: "/child-1-id") }
+RSpec.describe GovukTaxonomyHelpers::Taxon do
+  let(:root_node) { GovukTaxonomyHelpers::Taxon.new(title: "root-id", content_id: "abc", base_path: "/root-id") }
+  let(:child_node_1) { GovukTaxonomyHelpers::Taxon.new(title: "child-1-id", content_id: "abc", base_path: "/child-1-id") }
 
   describe "#<<(child_node)" do
     it "makes one node the child of another node" do
@@ -17,8 +17,8 @@ RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
   describe "#tree" do
     context "given a node with a tree of successors" do
       it "returns an array representing a pre-order traversal of the tree" do
-        child_node_2 = GovukTaxonomyHelpers::LinkedContentItem.new(title: "child-2-id", content_id: "abc", base_path: "/child-2-id")
-        child_node_3 = GovukTaxonomyHelpers::LinkedContentItem.new(title: "child-3-id", content_id: "abc", base_path: "/child-3-id")
+        child_node_2 = GovukTaxonomyHelpers::Taxon.new(title: "child-2-id", content_id: "abc", base_path: "/child-2-id")
+        child_node_3 = GovukTaxonomyHelpers::Taxon.new(title: "child-3-id", content_id: "abc", base_path: "/child-3-id")
 
         root_node << child_node_1
         child_node_1 << child_node_3
@@ -54,7 +54,7 @@ RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
 
   describe "#depth" do
     it "returns the depth of the node in its tree" do
-      child_node_2 = GovukTaxonomyHelpers::LinkedContentItem.new(title: "child-2-id", content_id: "abc", base_path: "/child-2-id")
+      child_node_2 = GovukTaxonomyHelpers::Taxon.new(title: "child-2-id", content_id: "abc", base_path: "/child-2-id")
       root_node << child_node_1
       child_node_1 << child_node_2
 
@@ -74,7 +74,7 @@ RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
 
   context "taxon with ancestors" do
     let(:child_node_2) do
-      GovukTaxonomyHelpers::LinkedContentItem.new(
+      GovukTaxonomyHelpers::Taxon.new(
         title: "child-2-id",
         content_id: "abc",
         base_path: "/child-2-id"
@@ -111,47 +111,6 @@ RSpec.describe GovukTaxonomyHelpers::LinkedContentItem do
 
       it "is an empty array for the root node" do
         expect(root_node.ancestors).to be_empty
-      end
-    end
-
-    describe "#taxons" do
-      let(:content_item) do
-        GovukTaxonomyHelpers::LinkedContentItem.new(
-          title: "content",
-          content_id: "abc",
-          base_path: "/content"
-        )
-      end
-
-      it "includes only the directly linked taxons" do
-        content_item.add_taxon(child_node_2)
-
-        expect(content_item.taxons.map(&:title)).to eq ["child-2-id"]
-      end
-    end
-
-    describe "#taxons_with_ancestors" do
-      let(:another_taxon) do
-        GovukTaxonomyHelpers::LinkedContentItem.new(
-          title: "another-taxon",
-          content_id: "abc",
-          base_path: "/another-taxon"
-        )
-      end
-
-      let(:content_item) do
-        GovukTaxonomyHelpers::LinkedContentItem.new(
-          title: "content",
-          content_id: "abc",
-          base_path: "/content"
-        )
-      end
-
-      it "includes all of the taxons and all of their anscestors" do
-        content_item.add_taxon(child_node_2)
-        content_item.add_taxon(another_taxon)
-
-        expect(content_item.taxons_with_ancestors.map(&:title).sort).to eq %w(another-taxon child-1-id child-2-id root-id)
       end
     end
   end
