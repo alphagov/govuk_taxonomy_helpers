@@ -1,3 +1,5 @@
+require 'forwardable'
+
 module GovukTaxonomyHelpers
   # A LinkedContentItem can be anything that has a content store representation
   # on GOV.UK.
