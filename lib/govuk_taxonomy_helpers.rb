@@ -1,3 +1,5 @@
-require "govuk_taxonomy_helpers/version"
-require "govuk_taxonomy_helpers/publishing_api_response"
-require "govuk_taxonomy_helpers/linked_content_item"
+module GovukTaxonomyHelpers
+  Dir[File.dirname(__FILE__) + '/govuk_taxonomy_helpers/*.rb'].each do |file|
+    require file
+  end
+end

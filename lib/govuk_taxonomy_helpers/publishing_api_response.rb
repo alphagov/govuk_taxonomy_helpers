@@ -1,5 +1,3 @@
-require 'govuk_taxonomy_helpers/linked_content_item'
-
 module GovukTaxonomyHelpers
   class LinkedContentItem
     # Extract a LinkedContentItem from publishing api response data.
