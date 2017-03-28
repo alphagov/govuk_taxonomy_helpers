@@ -402,4 +402,48 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
       expect(minimal_taxon.descendants.map(&:internal_name)).to all(be_nil)
     end
   end
+
+  context "given a downstream response" do
+    let(:expanded_content_item) do
+      child_1 = {
+        "content_id" => "74aadc14-9bca-40d9-abb4-4f21f9792a05",
+        "base_path" => "/child-1",
+        "title" => "Child 1",
+        "details" => {
+          "internal_name" => "C 1",
+        },
+        "links" => {}
+      }
+
+      child_2 = {
+        "content_id" => "84aadc14-9bca-40d9-abb4-4f21f9792a05",
+        "base_path" => "/child-2",
+        "title" => "Child 2",
+        "details" => {
+          "internal_name" => "C 2",
+        },
+        "links" => {}
+      }
+
+      {
+        "content_id" => "64aadc14-9bca-40d9-abb4-4f21f9792a05",
+        "base_path" => "/taxon",
+        "title" => "Taxon",
+        "details" => {
+          "internal_name" => "My lovely taxon"
+        },
+        "links" => {
+          "child_taxons" => [child_1, child_2]
+        }
+      }
+    end
+
+    it "parses the taxonomy struture" do
+      taxon = GovukTaxonomyHelpers::LinkedContentItem.from_publishing_api_downstream(
+        expanded_content_item
+      )
+      expect(taxon.title).to eq("Taxon")
+      expect(taxon.children.map(&:title)).to eq(["Child 1", "Child 2"])
+    end
+  end
 end

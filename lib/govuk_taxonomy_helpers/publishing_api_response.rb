@@ -13,6 +13,17 @@ module GovukTaxonomyHelpers
         expanded_links: expanded_links,
       ).linked_content_item
     end
+
+    # Extract a LinkedContentItem from publishing api's message queue payload.
+    #
+    # @param expanded_content_item [Hash] Publishing API message queue payload
+    # @return [LinkedContentItem]
+    def self.from_publishing_api_downstream(expanded_content_item)
+      PublishingApiResponse.new(
+        content_item: expanded_content_item,
+        expanded_links: expanded_content_item,
+      ).linked_content_item
+    end
   end
 
   class PublishingApiResponse
@@ -35,10 +46,16 @@ module GovukTaxonomyHelpers
 
   private
 
+    def extract_links(item)
+      item["expanded_links"] || item["links"]
+    end
+
     def add_expanded_links(expanded_links_response)
-      child_taxons = expanded_links_response["expanded_links"]["child_taxons"]
-      parent_taxons = expanded_links_response["expanded_links"]["parent_taxons"]
-      taxons = expanded_links_response["expanded_links"]["taxons"]
+      direct_links = extract_links(expanded_links_response)
+
+      child_taxons = direct_links["child_taxons"]
+      parent_taxons = direct_links["parent_taxons"]
+      taxons = direct_links["taxons"]
 
       if !child_taxons.nil?
         child_taxons.each do |child|
