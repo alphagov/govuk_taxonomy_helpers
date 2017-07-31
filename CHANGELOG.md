@@ -1,4 +1,4 @@
-## Unreleased
+## 0.1.1
 
 * Adds the from_content_id builder method to LinkedContentItem
 
