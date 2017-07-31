@@ -13,6 +13,37 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
     }
   end
 
+  describe '#from_content_id - simple one child case' do
+    let(:expanded_links) do
+      child = {
+        "content_id" => "74aadc14-9bca-40d9-abb4-4f21f9792a05",
+        "base_path" => "/child",
+        "title" => "Child",
+        "details" => {
+          "internal_name" => "C",
+        },
+        "links" => {}
+      }
+
+      {
+        "content_id" => "64aadc14-9bca-40d9-abb4-4f21f9792a05",
+        "expanded_links" => {
+          "child_taxons" => [child]
+        }
+      }
+    end
+    before :each do
+      @publishing_api = double('publishing_api')
+      allow(@publishing_api).to receive(:get_content).with('64aadc14-9bca-40d9-abb4-4f21f9792a05').and_return(content_item)
+      allow(@publishing_api).to receive(:get_expanded_links).with('64aadc14-9bca-40d9-abb4-4f21f9792a05').and_return(expanded_links)
+    end
+    it 'loads the taxon' do
+      expect(linked_content_item.title).to eq("Taxon")
+      expect(linked_content_item.children.map(&:title)).to eq(["Child"])
+      expect(linked_content_item.children.map(&:children)).to all(be_empty)
+    end
+  end
+
   let(:linked_content_item) do
     GovukTaxonomyHelpers::LinkedContentItem.from_publishing_api(
       content_item: content_item,
