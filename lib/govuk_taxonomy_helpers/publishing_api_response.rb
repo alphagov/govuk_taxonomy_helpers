@@ -13,6 +13,18 @@ module GovukTaxonomyHelpers
         expanded_links: expanded_links,
       ).linked_content_item
     end
+
+    # Use the publishing API service to fetch and extract a LinkedContentItem
+    #
+    # @param content_id [String] id of the content
+    # @param publishing_api [PublishingApiV2] Publishing API service
+    # @return [LinkedContentItem]
+    def self.from_content_id(content_id:, publishing_api:)
+      GovukTaxonomyHelpers::LinkedContentItem.from_publishing_api(
+        content_item: publishing_api.get_content(content_id).to_h,
+        expanded_links: publishing_api.get_expanded_links(content_id).to_h
+      )
+    end
   end
 
   class PublishingApiResponse
