@@ -22,17 +22,14 @@ Or install it yourself as:
 
 The API is provisional and is likely to change for versions < 1.0.0.
 
-To access the taxonomy, first request the content from the [publishing api](https://github.com/alphagov/publishing-api), then parse it to get a `LinkedContentItem` object.
+To access the taxonomy, first get the content_id of the piece of content you want the taxonomy for, then parse it to get a `LinkedContentItem` object.
 
 ```ruby
 require 'govuk_taxonomy_helpers'
 
-content_item = Services.publishing_api.get_content("c75c541-403f-4cb1-9b34-4ddde816a80d")
-expanded_links = Services.publishing_api.get_expanded_links("c75c541-403f-4cb1-9b34-4ddde816a80d")
-
-taxonomy = GovukTaxonomyHelpers::LinkedContentItem.from_publishing_api(
-  content_item: content_item,
-  expanded_links: expanded_links
+taxonomy = GovukTaxonomyHelpers::LinkedContentItem.from_content_id(
+  content_id: "c75c541-403f-4cb1-9b34-4ddde816a80d",
+  publishing_api: Services.publishing_api
 )
 ```
 

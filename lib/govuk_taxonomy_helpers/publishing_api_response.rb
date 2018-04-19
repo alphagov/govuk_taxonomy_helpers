@@ -1,29 +1,16 @@
 module GovukTaxonomyHelpers
   class LinkedContentItem
-    # Extract a LinkedContentItem from publishing api response data.
-    #
-    # @param content_item [Hash] Publishing API `get_content` response hash
-    # @param expanded_links [Hash] Publishing API `get_expanded_links` response hash
-    # @return [LinkedContentItem]
-    # @see http://www.rubydoc.info/gems/gds-api-adapters/GdsApi/PublishingApiV2#get_content-instance_method
-    # @see http://www.rubydoc.info/gems/gds-api-adapters/GdsApi%2FPublishingApiV2:get_expanded_links
-    def self.from_publishing_api(content_item:, expanded_links:)
-      PublishingApiResponse.new(
-        content_item: content_item,
-        expanded_links: expanded_links,
-      ).linked_content_item
-    end
-
     # Use the publishing API service to fetch and extract a LinkedContentItem
     #
     # @param content_id [String] id of the content
     # @param publishing_api [PublishingApiV2] Publishing API service
     # @return [LinkedContentItem]
     def self.from_content_id(content_id:, publishing_api:)
-      GovukTaxonomyHelpers::LinkedContentItem.from_publishing_api(
+      PublishingApiResponse.new(
         content_item: publishing_api.get_content(content_id).to_h,
-        expanded_links: publishing_api.get_expanded_links(content_id).to_h
-      )
+        expanded_links: publishing_api.get_expanded_links(content_id).to_h,
+        publishing_api: publishing_api
+      ).linked_content_item
     end
   end
 
@@ -32,7 +19,8 @@ module GovukTaxonomyHelpers
 
     # @param content_item [Hash] Publishing API `get_content` response hash
     # @param expanded_links [Hash] Publishing API `get_expanded_links` response hash
-    def initialize(content_item:, expanded_links:)
+    # @param publishing_api [PublishingApiV2] Publishing API service
+    def initialize(content_item:, expanded_links:, publishing_api:)
       details = content_item["details"] || {}
 
       @linked_content_item = LinkedContentItem.new(
@@ -42,30 +30,39 @@ module GovukTaxonomyHelpers
         base_path: content_item["base_path"]
       )
 
-      add_expanded_links(expanded_links)
+      add_expanded_links(expanded_links, publishing_api)
     end
 
   private
 
-    def add_expanded_links(expanded_links_response)
+    def add_expanded_links(expanded_links_response, publishing_api)
+      level_one_taxons = expanded_links_response["expanded_links"]["level_one_taxons"]
       child_taxons = expanded_links_response["expanded_links"]["child_taxons"]
       parent_taxons = expanded_links_response["expanded_links"]["parent_taxons"]
       taxons = expanded_links_response["expanded_links"]["taxons"]
 
-      if !child_taxons.nil?
+      if level_one_taxons
+        level_one_taxons.each do |taxon|
+          expanded = publishing_api.get_expanded_links(taxon['content_id'])
+          taxon['links'] = expanded['expanded_links']
+          linked_content_item << parse_nested_child(taxon)
+        end
+      end
+
+      if child_taxons
         child_taxons.each do |child|
           linked_content_item << parse_nested_child(child)
         end
       end
 
-      if !parent_taxons.nil?
+      if parent_taxons
         # Assume no taxon has multiple parents
         single_parent = parent_taxons.first
 
         parse_nested_parent(single_parent) << linked_content_item
       end
 
-      if !taxons.nil?
+      if taxons
         taxons.each do |taxon|
           taxon_node = parse_nested_parent(taxon)
           linked_content_item.add_taxon(taxon_node)
