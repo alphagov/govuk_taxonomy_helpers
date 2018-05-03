@@ -1,4 +1,4 @@
-## Unreleased
+## 1.0.0
 
 * Merges from_content_id and from_publishing_api into one builder method contained
 in LinkedContentItem. The homepage can now have it's links expanded through
