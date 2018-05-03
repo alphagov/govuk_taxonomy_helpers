@@ -13,42 +13,47 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
     }
   end
 
-  describe '#from_content_id - simple one child case' do
-    let(:expanded_links) do
-      child = {
-        "content_id" => "74aadc14-9bca-40d9-abb4-4f21f9792a05",
-        "base_path" => "/child",
-        "title" => "Child",
-        "details" => {
-          "internal_name" => "C",
-        },
-        "links" => {}
-      }
+  let(:expanded_links) do
+    child = {
+      "content_id" => "74aadc14-9bca-40d9-abb4-4f21f9792a05",
+      "base_path" => "/child",
+      "title" => "Child",
+      "details" => {
+        "internal_name" => "C",
+      },
+      "links" => {}
+    }
 
-      {
-        "content_id" => "64aadc14-9bca-40d9-abb4-4f21f9792a05",
-        "expanded_links" => {
-          "child_taxons" => [child]
-        }
+    {
+      "content_id" => "64aadc14-9bca-40d9-abb4-4f21f9792a05",
+      "expanded_links" => {
+        "child_taxons" => [child]
       }
-    end
-    before :each do
-      @publishing_api = double('publishing_api')
-      allow(@publishing_api).to receive(:get_content).with('64aadc14-9bca-40d9-abb4-4f21f9792a05').and_return(content_item)
-      allow(@publishing_api).to receive(:get_expanded_links).with('64aadc14-9bca-40d9-abb4-4f21f9792a05').and_return(expanded_links)
-    end
+    }
+  end
+
+  let(:publishing_api) do
+    double('publishing_api')
+  end
+
+  before do
+    allow(publishing_api).to receive(:get_content).with('64aadc14-9bca-40d9-abb4-4f21f9792a05').and_return(content_item)
+    allow(publishing_api).to receive(:get_expanded_links).with('64aadc14-9bca-40d9-abb4-4f21f9792a05').and_return(expanded_links)
+  end
+
+  let(:linked_content_item) do
+    GovukTaxonomyHelpers::LinkedContentItem.from_content_id(
+      content_id: content_item['content_id'],
+      publishing_api: publishing_api
+    )
+  end
+
+  describe '#from_content_id - simple one child case' do
     it 'loads the taxon' do
       expect(linked_content_item.title).to eq("Taxon")
       expect(linked_content_item.children.map(&:title)).to eq(["Child"])
       expect(linked_content_item.children.map(&:children)).to all(be_empty)
     end
-  end
-
-  let(:linked_content_item) do
-    GovukTaxonomyHelpers::LinkedContentItem.from_publishing_api(
-      content_item: content_item,
-      expanded_links: expanded_links
-    )
   end
 
   context "content item with multiple levels of descendants" do
@@ -372,8 +377,69 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
     end
   end
 
+  context "homepage content item with a level_one_taxon and a child" do
+    it "parses each level of taxons from home page" do
+      root_taxon = {
+        "content_id" => "f3bbdec2-0e62-4520-a7fd-6ffd5d36e03a",
+        "base_path" => "/",
+        "title" => "GOV.UK homepage",
+        "details" => {}
+      }
+
+      child_for_level_one_taxon = {
+        "content_id" => "84aadc14-9bca-40d9-abb4-4f21f9792a05",
+        "base_path" => "/transport_child",
+        "title" => "Transport child",
+        "details" => {
+          "internal_name" => "TC 1",
+        },
+        "links" => {}
+      }
+
+      level_one_taxon = {
+        "content_id" => "a4038b29-b332-4f13-98b1-1c9709e216bc",
+        "base_path" => "/transport/all",
+        "title" => "Transport",
+        "details" => {
+          "internal_name" => "Transport",
+        },
+        "links" => {
+          "child_taxons" => [child_for_level_one_taxon],
+          "root_taxon" => [root_taxon]
+        }
+      }
+
+      expanded_links = {
+        "expanded_links" => {
+          "level_one_taxons" => [level_one_taxon],
+        }
+      }
+
+      expanded_links_2 = {
+        "expanded_links" => {
+          "child_taxons" => [child_for_level_one_taxon]
+        }
+      }
+
+      allow(publishing_api).to receive(:get_content).with('f3bbdec2-0e62-4520-a7fd-6ffd5d36e03a').and_return(root_taxon)
+      allow(publishing_api).to receive(:get_expanded_links).with('f3bbdec2-0e62-4520-a7fd-6ffd5d36e03a').and_return(expanded_links)
+      allow(publishing_api).to receive(:get_expanded_links).with('a4038b29-b332-4f13-98b1-1c9709e216bc').and_return(expanded_links_2)
+
+      homepage_taxon = GovukTaxonomyHelpers::LinkedContentItem.from_content_id(
+        content_id: root_taxon['content_id'],
+        publishing_api: publishing_api
+      )
+
+      expect(homepage_taxon.title).to eq("GOV.UK homepage")
+      expect(homepage_taxon.parent).to eq(nil)
+      expect(homepage_taxon.children.map(&:title)).to eq(["Transport"])
+      expect(homepage_taxon.descendants.map(&:title)).to eq(["Transport", "Transport child"])
+      expect(homepage_taxon.children.first.children.first.title).to eq("Transport child")
+    end
+  end
+
   context "minimal responses with missing links and details hashes" do
-    let(:minimal_taxon) do
+    it "parses taxons with nil internal names" do
       grandchild_1 = {
         "content_id" => "84aadc14-9bca-40d9-abb4-4f21f9792a05",
         "base_path" => "/grandchild-1",
@@ -418,13 +484,14 @@ RSpec.describe GovukTaxonomyHelpers::PublishingApiResponse do
         }
       }
 
-      GovukTaxonomyHelpers::LinkedContentItem.from_publishing_api(
-        content_item: content_item,
-        expanded_links: expanded_links
-      )
-    end
+      allow(publishing_api).to receive(:get_content).with('aaaaaa14-9bca-40d9-abb4-4f21f9792a05').and_return(content_item)
+      allow(publishing_api).to receive(:get_expanded_links).with('aaaaaa14-9bca-40d9-abb4-4f21f9792a05').and_return(expanded_links)
 
-    it "parses taxons with nil internal names" do
+      minimal_taxon = GovukTaxonomyHelpers::LinkedContentItem.from_content_id(
+        content_id: content_item['content_id'],
+        publishing_api: publishing_api
+      )
+
       expect(minimal_taxon.title).to eq("Minimal Taxon")
       expect(minimal_taxon.internal_name).to be_nil
       expect(minimal_taxon.parent.title).to eq("Parent Taxon")
