@@ -1,12 +1,10 @@
 AllCops:
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.6
 
-# Method documentation is required to ensure the gem is fully documented
-Style/DocumentationMethod:
-  Enabled: true
+inherit_gem:
+  rubocop-govuk:
+    - config/default.yml
 
-Style/VariableNumber:
-  Enabled: false
-
-Style/SafeNavigation:
-  Enabled: false
+inherit_mode:
+  merge:
+    - Exclude

@@ -9,7 +9,7 @@ module GovukTaxonomyHelpers
       PublishingApiResponse.new(
         content_item: publishing_api.get_content(content_id).to_h,
         expanded_links: publishing_api.get_expanded_links(content_id).to_h,
-        publishing_api: publishing_api
+        publishing_api: publishing_api,
       ).linked_content_item
     end
   end
@@ -27,7 +27,7 @@ module GovukTaxonomyHelpers
         title: content_item["title"],
         internal_name: details["internal_name"],
         content_id: content_item["content_id"],
-        base_path: content_item["base_path"]
+        base_path: content_item["base_path"],
       )
 
       add_expanded_links(expanded_links, publishing_api)
@@ -43,8 +43,8 @@ module GovukTaxonomyHelpers
 
       if level_one_taxons
         level_one_taxons.each do |taxon|
-          expanded = publishing_api.get_expanded_links(taxon['content_id'])
-          taxon['links'] = expanded['expanded_links']
+          expanded = publishing_api.get_expanded_links(taxon["content_id"])
+          taxon["links"] = expanded["expanded_links"]
           linked_content_item << parse_nested_child(taxon)
         end
       end
@@ -78,12 +78,12 @@ module GovukTaxonomyHelpers
         title: nested_item["title"],
         internal_name: details["internal_name"],
         content_id: nested_item["content_id"],
-        base_path: nested_item["base_path"]
+        base_path: nested_item["base_path"],
       )
 
       child_taxons = links["child_taxons"]
 
-      if !child_taxons.nil?
+      unless child_taxons.nil?
         child_taxons.each do |child|
           nested_linked_content_item << parse_nested_child(child)
         end
@@ -100,12 +100,12 @@ module GovukTaxonomyHelpers
         title: nested_item["title"],
         internal_name: details["internal_name"],
         content_id: nested_item["content_id"],
-        base_path: nested_item["base_path"]
+        base_path: nested_item["base_path"],
       )
 
       parent_taxons = links["parent_taxons"]
 
-      if !parent_taxons.nil?
+      unless parent_taxons.nil?
         single_parent = parent_taxons.first
         parse_nested_parent(single_parent) << nested_linked_content_item
       end
