@@ -1,4 +1,4 @@
-require 'forwardable'
+require "forwardable"
 
 module GovukTaxonomyHelpers
   # A LinkedContentItem can be anything that has a content store representation
@@ -45,7 +45,6 @@ module GovukTaxonomyHelpers
       end
     end
 
-
     # Get descendants of a taxon
     #
     # @return [Array] all taxons in this branch of the taxonomy, excluding the content item itself
@@ -91,6 +90,7 @@ module GovukTaxonomyHelpers
     # @return [Integer] the number of taxons between this taxon and the taxonomy root
     def depth
       return 0 if root?
+
       1 + parent.depth
     end
 

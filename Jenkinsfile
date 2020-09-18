@@ -21,7 +21,7 @@ node {
     }
 
     stage('Linter') {
-      govuk.rubyLinter()
+      govuk.runRakeTask("lint")
     }
 
     stage('Tests') {
