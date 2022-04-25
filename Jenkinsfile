@@ -13,7 +13,7 @@ node {
 
     stage('Clean') {
       govuk.cleanupGit()
-      govuk.mergeMasterBranch()
+      govuk.mergeIntoBranch("main")
     }
 
     stage('Bundle') {
