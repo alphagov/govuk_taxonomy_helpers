@@ -28,7 +28,7 @@ node {
       govuk.runTests('spec')
     }
 
-    if(env.BRANCH_NAME == "master") {
+    if(env.BRANCH_NAME == "main") {
       stage('Publish Gem') {
         govuk.publishGem(REPOSITORY, env.BRANCH_NAME)
       }
