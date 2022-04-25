@@ -30,7 +30,7 @@ node {
 
     if(env.BRANCH_NAME == "main") {
       stage('Publish Gem') {
-        govuk.publishGem(REPOSITORY, env.BRANCH_NAME)
+        govuk.publishGem(REPOSITORY, REPOSITORY, env.BRANCH_NAME)
       }
     }
 
