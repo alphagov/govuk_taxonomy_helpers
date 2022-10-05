@@ -10,9 +10,9 @@ module GovukTaxonomyHelpers
   # Taxon instances can have an optional parent and any number of child taxons.
   class LinkedContentItem
     extend Forwardable
-    attr_reader :title, :content_id, :base_path, :children, :internal_name
+    attr_reader :title, :content_id, :base_path, :children, :internal_name, :taxons
     attr_accessor :parent
-    attr_reader :taxons
+
     def_delegators :tree, :map, :each
 
     # @param title [String] the user facing name for the content item
