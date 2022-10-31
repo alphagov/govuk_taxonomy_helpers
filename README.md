@@ -1,5 +1,7 @@
 # GovukTaxonomyHelpers
 
+**This project was archived in October 2022, the functionality has been ported into [content-tagger](https://github.com/alphagov/content-tagger/pull/1391).**
+
 Parses the taxonomy of GOV.UK into a browseable tree structure.
 
 ## Installation
